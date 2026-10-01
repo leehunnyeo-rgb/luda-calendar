@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>루다 캘린더</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f6f5f2;--paper:#fff;--line:#dedbd4;--text:#242321;--muted:#8d8981;--purple:#cfc5e8;--sat:#4d78c7;--sun:#d76b6b;--today:#eee7fb;--shadow:0 12px 40px rgba(44,38,55,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"Noto Sans KR",system-ui,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:1400px;margin:28px auto;padding:0 22px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.brand{font-size:14px;font-weight:900;letter-spacing:.12em;color:#77716b}
+.actions{display:flex;gap:8px}.btn{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 13px;font-weight:800}.primary{background:#29272b;color:#fff;border-color:#29272b}
+.status{font-size:12px;color:#777;min-height:18px;margin:0 0 7px}
+.calendar{background:#fff;border:1px solid #d4d0c9;border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.monthbar{height:88px;background:var(--purple);display:flex;justify-content:center;align-items:center;position:relative}.title{font-size:27px;font-weight:900}.title span{margin-left:15px;font-size:23px}.nav{position:absolute;right:18px;display:flex;gap:7px}.nav button{width:38px;height:38px;border:0;border-radius:10px;background:#ffffffa8;font-size:19px}
+.weekdays,.grid{display:grid;grid-template-columns:repeat(7,1fr)}.weekdays{border-bottom:1px solid var(--line)}.weekdays div{text-align:center;padding:12px 5px;background:#faf9f7;font-size:13px;font-weight:900}.weekdays div:nth-child(6){color:var(--sat)}.weekdays div:nth-child(7){color:var(--sun)}
+.day{min-height:145px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px;position:relative;background:#fff}.day:nth-child(7n){border-right:0}.day.muted{background:#f8f7f5;color:#aaa}.day.today{background:var(--today)}
+.date{display:inline-flex;width:27px;height:27px;align-items:center;justify-content:center;border-radius:50%;font-size:14px;font-weight:900}.sat .date{color:var(--sat)}.sun .date{color:var(--sun)}.today .date{background:#6f5b98;color:#fff}
+.events{display:flex;flex-direction:column;gap:6px;margin-top:7px}.event{padding:9px;border-radius:7px;font-size:13px;line-height:1.25;font-weight:750;white-space:pre-wrap;cursor:pointer}.event.gray{background:#ddd}.event.green{background:#dcebd5}.event.yellow{background:#fff0c5}.event.pink{background:#f5dce1}.event.blue{background:#dbe7f8}.event.purple{background:#e7ddf5}
+.legend{padding:13px 16px;border-top:1px solid var(--line);font-size:12px;color:#716c66;display:flex;gap:14px}.dot{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px}
+.modal-bg{display:none;position:fixed;inset:0;background:#1e1c1e59;align-items:center;justify-content:center;padding:20px;z-index:10}.modal{width:min(480px,100%);background:#fff;border-radius:18px;padding:22px;box-shadow:0 20px 70px #0003}.modal h2{margin:0 0 18px}.field{margin:12px 0}.field label{display:block;font-size:12px;font-weight:900;color:#777;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px}.field textarea{min-height:80px;resize:vertical}.colors{display:flex;gap:8px}.color{width:30px;height:30px;border-radius:8px;border:2px solid transparent}.color.active{border-color:#222}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+@media(max-width:800px){.app{margin:10px auto;padding:0 8px}.top{align-items:flex-start}.actions{flex-wrap:wrap;justify-content:flex-end}.monthbar{height:72px}.title{font-size:21px}.title span{font-size:18px}.day{min-height:105px;padding:5px}.event{font-size:10px;padding:6px}.weekdays div{font-size:11px;padding:9px 3px}.btn{font-size:12px;padding:7px 9px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand">LUDA CALENDAR</div>
+    <div class="actions">
+      <button class="btn" onclick="goToday()">오늘</button>
+      <button class="btn" id="loginBtn" onclick="openLogin()">관리자 로그인</button>
+      <button class="btn primary" id="addBtn" style="display:none" onclick="openAdd()">＋ 일정 추가</button>
+    </div>
+  </div>
+  <div class="status" id="status">캘린더를 불러오는 중…</div>
+  <div class="calendar">
+    <div class="monthbar"><div class="title"><span id="year"></span><span id="month"></span></div><div class="nav"><button onclick="moveMonth(-1)">‹</button><button onclick="moveMonth(1)">›</button></div></div>
+    <div class="weekdays"><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div><div>일</div></div>
+    <div class="grid" id="grid"></div>
+    <div class="legend"><span><i class="dot" style="background:#ddd"></i>휴방</span><span><i class="dot" style="background:#dcebd5"></i>일정</span><span><i class="dot" style="background:#fff0c5"></i>공연/외출</span></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="loginModal"><div class="modal">
+<h2>관리자 로그인</h2>
+<div class="field"><label>이메일</label><input id="email" type="email" autocomplete="username"></div>
+<div class="field"><label>비밀번호</label><input id="password" type="password" autocomplete="current-password"></div>
+<div class="modal-actions"><button class="btn" onclick="closeLogin()">취소</button><button class="btn primary" onclick="login()">로그인</button></div>
+</div></div>
+
+<div class="modal-bg" id="eventModal"><div class="modal">
+<h2 id="eventTitle">일정 추가</h2>
+<div class="field"><label>날짜</label><input id="eventDate" type="date"></div>
+<div class="field"><label>일정</label><textarea id="eventText" placeholder="예: 휴방&#10;루다극장"></textarea></div>
+<div class="field"><label>색상</label><div class="colors">
+<button class="color active" data-c="gray" style="background:#ddd" onclick="pickColor(this)"></button>
+<button class="color" data-c="green" style="background:#dcebd5" onclick="pickColor(this)"></button>
+<button class="color" data-c="yellow" style="background:#fff0c5" onclick="pickColor(this)"></button>
+<button class="color" data-c="pink" style="background:#f5dce1" onclick="pickColor(this)"></button>
+<button class="color" data-c="blue" style="background:#dbe7f8" onclick="pickColor(this)"></button>
+<button class="color" data-c="purple" style="background:#e7ddf5" onclick="pickColor(this)"></button>
+</div></div>
+<div class="modal-actions"><button class="btn" onclick="closeEvent()">취소</button><button class="btn primary" onclick="saveEvent()">저장</button></div>
+</div></div>
+
+<script>
+/* ===== 1) Supabase 프로젝트에서 받은 값을 여기에 넣으세요. ===== */
+const SUPABASE_URL = "https://invachujoiisrbhkzhzc.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_1-PfSu1n9AE0PdTKTQExFA_tIsfTJmZ";
+/* ============================================================ */
+const configured = !SUPABASE_URL.includes("여기에_") && !SUPABASE_ANON_KEY.includes("여기에_");
+const sb = configured ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY) : null;
+
+let current=new Date(), events=[], editId=null, chosenColor="gray";
+function keyDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function setStatus(t){document.getElementById('status').textContent=t}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+
+async function loadEvents(){
+ if(!configured){setStatus("설정 전 미리보기 모드 · Supabase 연결 후 여러 사람이 같은 일정을 공유할 수 있어요."); render(); return}
+ const start=new Date(current.getFullYear(),current.getMonth()-1,1), end=new Date(current.getFullYear(),current.getMonth()+2,1);
+ const {data,error}=await sb.from('events').select('*').gte('event_date',keyDate(start)).lt('event_date',keyDate(end)).order('event_date');
+ if(error){setStatus("데이터를 불러오지 못했습니다: "+error.message);return}
+ events=data||[]; render();
+}
+function render(){
+ const y=current.getFullYear(),m=current.getMonth();document.getElementById('year').textContent=y+" 년";document.getElementById('month').textContent=(m+1)+" 월";
+ const first=new Date(y,m,1),last=new Date(y,m+1,0),start=(first.getDay()+6)%7,total=Math.ceil((start+last.getDate())/7)*7;let html='';
+ for(let i=0;i<total;i++){let n=i-start+1,d=new Date(y,m,n),inside=n>=1&&n<=last.getDate(),key=keyDate(d),cls='day '+(inside?'':'muted')+(d.getDay()==6?' sat':'')+(d.getDay()==0?' sun':'');if(d.toDateString()===new Date().toDateString())cls+=' today';
+ html+=`<div class="${cls}" onclick="cellClick('${key}')"><div class="date">${d.getDate()}</div><div class="events">`;
+ events.filter(e=>e.event_date===key).forEach(e=>html+=`<div class="event ${e.color}" onclick="eventClick(event,'${e.id}')">${escapeHtml(e.text)}</div>`);
+ html+='</div></div>'}
+ document.getElementById('grid').innerHTML=html;
+}
+function moveMonth(n){current.setMonth(current.getMonth()+n);loadEvents()}function goToday(){let d=new Date();current=new Date(d.getFullYear(),d.getMonth(),1);loadEvents()}
+function cellClick(date){if(sb)openAdd(date)}
+function openLogin(){document.getElementById('loginModal').style.display='flex'}function closeLogin(){document.getElementById('loginModal').style.display='none'}
+async function login(){if(!sb)return;const {error}=await sb.auth.signInWithPassword({email:email.value,password:password.value});if(error)return alert(error.message);closeLogin();updateAuth()}
+async function logout(){await sb.auth.signOut();updateAuth()}
+async function updateAuth(){if(!sb)return;const {data:{session}}=await sb.auth.getSession();document.getElementById('loginBtn').textContent=session?'로그아웃':'관리자 로그인';document.getElementById('loginBtn').onclick=session?logout:openLogin;document.getElementById('addBtn').style.display=session?'inline-block':'none';if(session)setStatus("관리자 모드 · 일정 변경 내용이 모든 방문자에게 반영됩니다.");else setStatus("공개 보기 모드");}
+function openAdd(date){editId=null;document.getElementById('eventTitle').textContent='일정 추가';document.getElementById('eventDate').value=date||keyDate(new Date());document.getElementById('eventText').value='';chosenColor='gray';updateColors();document.getElementById('eventModal').style.display='flex'}
+function eventClick(ev,id){ev.stopPropagation();if(!sb)return;const e=events.find(x=>String(x.id)===String(id));if(!e)return;editId=e.id;document.getElementById('eventTitle').textContent='일정 수정';document.getElementById('eventDate').value=e.event_date;document.getElementById('eventText').value=e.text;chosenColor=e.color;updateColors();document.getElementById('eventModal').style.display='flex'}
+function closeEvent(){document.getElementById('eventModal').style.display='none'}function pickColor(x){chosenColor=x.dataset.c;updateColors()}function updateColors(){document.querySelectorAll('.color').forEach(x=>x.classList.toggle('active',x.dataset.c===chosenColor))}
+async function saveEvent(){if(!sb)return;const {data:{session}}=await sb.auth.getSession();if(!session)return alert("관리자 로그인이 필요합니다.");const row={event_date:eventDate.value,text:eventText.value.trim(),color:chosenColor};if(!row.event_date||!row.text)return alert("날짜와 일정을 입력해주세요.");
+ let result=editId?await sb.from('events').update(row).eq('id',editId):await sb.from('events').insert(row);if(result.error)return alert(result.error.message);closeEvent();await loadEvents()}
+window.addEventListener('load',async()=>{if(sb){await updateAuth();sb.auth.onAuthStateChange(()=>updateAuth())}await loadEvents()})
+</script>
+</body>
+</html>
