@@ -82,7 +82,7 @@
 
 
     /* =====================================================
-       로그인 상태
+       로그인
     ===================================================== */
 
     .info-bar {
@@ -270,7 +270,6 @@
 
     .calendar-grid.dragging {
       cursor: crosshair;
-
       user-select: none;
     }
 
@@ -326,7 +325,9 @@
     }
 
 
-    /* 날짜 숫자 */
+    /* =====================================================
+       날짜 숫자
+    ===================================================== */
 
     .day-number {
       position: relative;
@@ -365,41 +366,39 @@
 
 
     /* =====================================================
-       ★ 색상 일정 - 날짜 칸 전체
+       ★ 일정 1개일 때만 날짜 칸 전체 색상
     ===================================================== */
 
-    .day.colored-gray {
+    .day.single-colored-gray {
       background: #e7e7eb;
     }
 
-    .day.colored-green {
+    .day.single-colored-green {
       background: #d7f0dc;
     }
 
-    .day.colored-yellow {
+    .day.single-colored-yellow {
       background: #fff0b3;
     }
 
-    .day.colored-purple {
+    .day.single-colored-purple {
       background: #e6dcff;
     }
 
 
-    /* 마우스 올렸을 때 */
-
-    .day.colored-gray:hover {
+    .day.single-colored-gray:hover {
       background: #dfdfe3;
     }
 
-    .day.colored-green:hover {
+    .day.single-colored-green:hover {
       background: #cde9d3;
     }
 
-    .day.colored-yellow:hover {
+    .day.single-colored-yellow:hover {
       background: #ffe9a1;
     }
 
-    .day.colored-purple:hover {
+    .day.single-colored-purple:hover {
       background: #ddd1f8;
     }
 
@@ -419,20 +418,12 @@
       gap: 4px;
     }
 
-
-    /*
-      ★ 중요
-
-      색상이 있는 일정은 여기서 배경색을 절대 칠하지 않는다.
-      날짜 칸 자체(.day)에만 색상이 들어간다.
-    */
-
     .event {
+      display: block;
+
       padding: 4px 6px;
 
       border-radius: 6px;
-
-      color: #403a4b;
 
       font-size: 12px;
       line-height: 1.35;
@@ -446,7 +437,10 @@
     }
 
 
-    /* 색상 없음 일정만 작은 박스 */
+    /* =====================================================
+       ★ 여러 일정 / 색상 없음
+       → 글자 부분만 색칠
+    ===================================================== */
 
     .event.no-color {
       background: #f3f1f7;
@@ -459,21 +453,34 @@
 
 
     /*
-      ★ 색상이 있는 일정
+      색상 일정이지만
+      여러 개가 있는 경우
 
-      배경 없음.
-      날짜 칸 배경만 보이게 한다.
+      → 각각 글자 부분만 색칠
     */
 
-    .event.full-gray,
-    .event.full-green,
-    .event.full-yellow,
-    .event.full-purple {
-      background: transparent;
+    .event.multi-gray {
+      background: rgba(120,120,130,0.20);
 
-      border: 0;
+      color: #4e4e55;
+    }
 
-      color: #403a4b;
+    .event.multi-green {
+      background: rgba(72,160,94,0.20);
+
+      color: #317340;
+    }
+
+    .event.multi-yellow {
+      background: rgba(235,183,44,0.24);
+
+      color: #866817;
+    }
+
+    .event.multi-purple {
+      background: rgba(126,91,210,0.20);
+
+      color: #6843a7;
     }
 
 
@@ -590,9 +597,6 @@
         0 0 0 3px rgba(133,104,220,0.10);
     }
 
-
-    /* 여러 날짜 정보 */
-
     .range-info {
       padding: 11px 13px;
 
@@ -614,14 +618,10 @@
       color: #4e3a88;
     }
 
-
-    /* 모달 버튼 */
-
     .modal-buttons {
       display: flex;
 
       align-items: center;
-
       justify-content: flex-end;
 
       gap: 8px;
@@ -633,7 +633,6 @@
       padding: 10px 16px;
 
       border: 0;
-
       border-radius: 10px;
 
       cursor: pointer;
@@ -671,7 +670,6 @@
 
       .top-card {
         padding: 22px 20px;
-
         border-radius: 18px;
       }
 
@@ -681,7 +679,6 @@
 
       .calendar-card {
         padding: 10px;
-
         border-radius: 18px;
       }
 
@@ -695,7 +692,6 @@
 
       .weekday {
         padding: 8px 1px;
-
         font-size: 11px;
       }
 
@@ -711,7 +707,6 @@
       .day-number {
         width: 23px;
         height: 23px;
-
         font-size: 11px;
       }
 
@@ -723,6 +718,7 @@
         font-size: 10px;
       }
     }
+
   </style>
 </head>
 
@@ -738,7 +734,9 @@
 
   <div class="top-card">
 
-    <h1>루다의 캘린더</h1>
+    <h1>
+      루다의 캘린더
+    </h1>
 
     <p>
       일정을 한눈에 확인해보세요 ✨
@@ -759,6 +757,7 @@
     >
       공개 캘린더 · 누구나 일정 확인 가능
     </div>
+
 
     <button
       class="login-btn"
@@ -802,12 +801,14 @@
           ‹
         </button>
 
+
         <button
           class="today-btn"
           onclick="goToday()"
         >
           오늘
         </button>
+
 
         <button
           onclick="changeMonth(1)"
@@ -870,7 +871,7 @@
 
 
 <!-- =======================================================
-     일정 추가 / 수정
+     일정 추가 / 수정 모달
 ======================================================= -->
 
 <div
@@ -992,12 +993,14 @@
         삭제
       </button>
 
+
       <button
         class="cancel-btn"
         onclick="closeEventModal()"
       >
         취소
       </button>
+
 
       <button
         class="save-btn"
@@ -1015,7 +1018,7 @@
 
 
 <!-- =======================================================
-     로그인
+     로그인 모달
 ======================================================= -->
 
 <div
@@ -1086,6 +1089,7 @@
         취소
       </button>
 
+
       <button
         class="save-btn"
         onclick="login()"
@@ -1127,7 +1131,8 @@ const supabaseClient =
 let currentDate =
   new Date();
 
-let events = [];
+let events =
+  [];
 
 let currentUser =
   null;
@@ -1136,7 +1141,7 @@ let editingEventId =
   null;
 
 
-/* 드래그 */
+/* 드래그 상태 */
 
 let isDragging =
   false;
@@ -1188,7 +1193,9 @@ const loginButton =
    공통
 ========================================================= */
 
-function showError(message) {
+function showError(
+  message
+) {
 
   errorBox.textContent =
     message;
@@ -1208,28 +1215,41 @@ function clearError() {
 }
 
 
-/* 날짜 -> YYYY-MM-DD */
+/* =========================================================
+   날짜
+========================================================= */
 
-function formatDate(date) {
+function formatDate(
+  date
+) {
 
   const year =
     date.getFullYear();
 
+
   const month =
     String(
       date.getMonth() + 1
-    ).padStart(2, "0");
+    ).padStart(
+      2,
+      "0"
+    );
+
 
   const day =
     String(
       date.getDate()
-    ).padStart(2, "0");
+    ).padStart(
+      2,
+      "0"
+    );
 
-  return `${year}-${month}-${day}`;
+
+  return (
+    `${year}-${month}-${day}`
+  );
 }
 
-
-/* YYYY-MM-DD -> local Date */
 
 function parseLocalDate(
   dateString
@@ -1240,6 +1260,7 @@ function parseLocalDate(
       .split("-")
       .map(Number);
 
+
   return new Date(
     parts[0],
     parts[1] - 1,
@@ -1247,8 +1268,6 @@ function parseLocalDate(
   );
 }
 
-
-/* 특정 날짜의 일정 */
 
 function getEventsForDate(
   dateString
@@ -1259,100 +1278,6 @@ function getEventsForDate(
       event.date ===
       dateString
   );
-}
-
-
-/* =========================================================
-   ★ 중복 일정 정리용
-=========================================================
-
-   같은 날짜 + 같은 제목이 여러 개 존재하는 경우
-
-   색상이 있는 일정이 있으면
-   색상 없는 중복 일정은 화면에서 숨긴다.
-
-   예:
-
-   10월 5일
-   휴방 / 색상 없음
-   휴방 / 회색
-
-   → 화면에는 회색 일정 하나만 표시
-*/
-
-function getDisplayEvents(
-  dateString
-) {
-
-  const dayEvents =
-    getEventsForDate(
-      dateString
-    );
-
-
-  const groups =
-    new Map();
-
-
-  dayEvents.forEach(event => {
-
-    const title =
-      String(
-        event.title || ""
-      ).trim();
-
-
-    if (!groups.has(title)) {
-
-      groups.set(
-        title,
-        event
-      );
-
-      return;
-    }
-
-
-    const existing =
-      groups.get(title);
-
-
-    /*
-      기존이 색상 없음이고
-      새 일정에 색상이 있으면
-      새 일정을 사용
-    */
-
-    const existingHasColor =
-      !!(
-        existing.color &&
-        existing.color !== ""
-      );
-
-    const newHasColor =
-      !!(
-        event.color &&
-        event.color !== ""
-      );
-
-
-    if (
-      !existingHasColor &&
-      newHasColor
-    ) {
-
-      groups.set(
-        title,
-        event
-      );
-    }
-
-  });
-
-
-  return [
-    ...groups.values()
-  ];
 }
 
 
@@ -1375,7 +1300,8 @@ async function checkAuth() {
 
 
     currentUser =
-      session?.user || null;
+      session?.user ||
+      null;
 
 
     updateAuthUI();
@@ -1394,8 +1320,10 @@ function updateAuthUI() {
     loginStatus.textContent =
       "관리자 로그인 상태 · 일정 추가/수정/삭제 가능";
 
+
     loginButton.textContent =
       "로그아웃";
+
 
     loginButton.onclick =
       logout;
@@ -1405,8 +1333,10 @@ function updateAuthUI() {
     loginStatus.textContent =
       "공개 캘린더 · 누구나 일정 확인 가능";
 
+
     loginButton.textContent =
       "관리자 로그인";
+
 
     loginButton.onclick =
       openLoginModal;
@@ -1427,18 +1357,23 @@ function openLoginModal() {
     .getElementById(
       "loginModalBg"
     )
-    .classList.add("show");
+    .classList.add(
+      "show"
+    );
 
 
-  setTimeout(() => {
+  setTimeout(
+    () => {
 
-    document
-      .getElementById(
-        "emailInput"
-      )
-      .focus();
+      document
+        .getElementById(
+          "emailInput"
+        )
+        .focus();
 
-  }, 100);
+    },
+    100
+  );
 }
 
 
@@ -1448,7 +1383,9 @@ function closeLoginModal() {
     .getElementById(
       "loginModalBg"
     )
-    .classList.remove("show");
+    .classList.remove(
+      "show"
+    );
 }
 
 
@@ -1527,6 +1464,7 @@ async function login() {
 
     console.error(error);
 
+
     alert(
       "로그인에 실패했습니다.\n" +
       error.message
@@ -1553,6 +1491,7 @@ async function logout() {
   } catch (error) {
 
     console.error(error);
+
 
     alert(
       "로그아웃 중 오류가 발생했습니다."
@@ -1602,6 +1541,7 @@ async function loadEvents() {
 
     console.error(error);
 
+
     showError(
       "일정을 불러오지 못했습니다: " +
       error.message
@@ -1619,6 +1559,7 @@ function renderCalendar() {
   const year =
     currentDate.getFullYear();
 
+
   const month =
     currentDate.getMonth();
 
@@ -1632,22 +1573,25 @@ function renderCalendar() {
 
 
   /*
-    월요일 = 0
+    월요일 시작
 
-    JS Date:
-    일요일 0
-    월요일 1
-    화요일 2
-    ...
-    토요일 6
+    JS:
+    일 0
+    월 1
+    화 2
+    수 3
+    목 4
+    금 5
+    토 6
 
-    아래 변환으로
-
-    월요일 0
-    화요일 1
-    ...
-    토요일 5
-    일요일 6
+    캘린더:
+    월 0
+    화 1
+    수 2
+    목 3
+    금 4
+    토 5
+    일 6
   */
 
   const jsFirstDay =
@@ -1659,7 +1603,9 @@ function renderCalendar() {
 
 
   const firstDay =
-    (jsFirstDay + 6) % 7;
+    (
+      jsFirstDay + 6
+    ) % 7;
 
 
   const daysInMonth =
@@ -1685,8 +1631,10 @@ function renderCalendar() {
         "div"
       );
 
+
     empty.className =
       "empty-cell";
+
 
     calendarGrid.appendChild(
       empty
@@ -1697,8 +1645,11 @@ function renderCalendar() {
   const today =
     new Date();
 
+
   const todayString =
-    formatDate(today);
+    formatDate(
+      today
+    );
 
 
   /*
@@ -1720,7 +1671,9 @@ function renderCalendar() {
 
 
     const dateString =
-      formatDate(date);
+      formatDate(
+        date
+      );
 
 
     const day =
@@ -1753,7 +1706,9 @@ function renderCalendar() {
       date.getDay();
 
 
-    if (jsDay === 6) {
+    if (
+      jsDay === 6
+    ) {
 
       day.classList.add(
         "saturday"
@@ -1761,7 +1716,9 @@ function renderCalendar() {
     }
 
 
-    if (jsDay === 0) {
+    if (
+      jsDay === 0
+    ) {
 
       day.classList.add(
         "sunday"
@@ -1808,37 +1765,56 @@ function renderCalendar() {
 
 
     /* =====================================================
-       ★ 해당 날짜 일정
+       ★★★ 여기서 일정 개수를 판단
     ===================================================== */
 
     const dayEvents =
-      getDisplayEvents(
+      getEventsForDate(
         dateString
       );
 
 
-    /*
-      ★ 색상이 있는 일정 찾기
+    const eventCount =
+      dayEvents.length;
 
-      하나라도 색상이 있으면
-      그 색상으로 날짜 칸 전체를 칠한다.
+
+    /*
+      ======================================================
+      규칙
+
+      ① 일정이 정확히 1개
+         + 색상 있음
+         → 날짜 칸 전체 색칠
+
+      ② 일정이 2개 이상
+         → 전부 글자 부분만 색칠
+
+      ③ 일정이 1개
+         + 색상 없음
+         → 글자 부분만 표시
+      ======================================================
     */
 
-    const coloredEvent =
-      dayEvents.find(
-        event =>
-          event.color &&
-          event.color !== ""
-      );
 
+    if (
+      eventCount === 1
+    ) {
 
-    if (coloredEvent) {
+      const onlyEvent =
+        dayEvents[0];
+
 
       const color =
         String(
-          coloredEvent.color
+          onlyEvent.color || ""
         ).toLowerCase();
 
+
+      /*
+        ★ 일정 1개이고
+        색상이 있을 때만
+        날짜 칸 전체를 칠한다.
+      */
 
       if (
         [
@@ -1846,24 +1822,22 @@ function renderCalendar() {
           "green",
           "yellow",
           "purple"
-        ].includes(color)
+        ].includes(
+          color
+        )
       ) {
 
-        /*
-          ★ 핵심
-          여기서 날짜 칸 자체에만
-          colored-xxx를 붙인다.
-        */
-
         day.classList.add(
-          `colored-${color}`
+          `single-colored-${color}`
         );
       }
     }
 
 
     /*
-      일정 표시 영역
+      ======================================================
+      일정 표시
+    ======================================================
     */
 
     const eventsContainer =
@@ -1889,32 +1863,78 @@ function renderCalendar() {
           "event";
 
 
-        const hasColor =
-          !!(
-            event.color &&
-            event.color !== ""
-          );
+        const color =
+          String(
+            event.color || ""
+          ).toLowerCase();
 
 
-        if (hasColor) {
+        /*
+          ==================================================
+          ★ 일정 1개 + 색상 있음
 
-          /*
-            ★ 색상 일정은
-            날짜 칸 전체 색상만 사용.
+          날짜 전체가 이미 색칠됨.
 
-            일정 자체에는 배경색을 주지 않는다.
-          */
+          따라서 글자 부분에는
+          별도의 색상 배경을 주지 않는다.
+          ==================================================
+        */
+
+        if (
+          eventCount === 1 &&
+          color &&
+          [
+            "gray",
+            "green",
+            "yellow",
+            "purple"
+          ].includes(
+            color
+          )
+        ) {
 
           eventElement.classList.add(
-            `full-${event.color}`
+            "full-color-text"
           );
 
-        } else {
+        }
 
-          /*
-            색상 없음만
-            작은 회색 박스
-          */
+        /*
+          ==================================================
+          ★ 일정 2개 이상 + 색상 있음
+
+          날짜 전체는 칠하지 않고
+          일정 글자 부분만 색칠.
+          ==================================================
+        */
+
+        else if (
+          eventCount >= 2 &&
+          color &&
+          [
+            "gray",
+            "green",
+            "yellow",
+            "purple"
+          ].includes(
+            color
+          )
+        ) {
+
+          eventElement.classList.add(
+            `multi-${color}`
+          );
+        }
+
+        /*
+          ==================================================
+          색상 없음
+
+          항상 글자 부분 표시
+          ==================================================
+        */
+
+        else {
 
           eventElement.classList.add(
             "no-color"
@@ -1927,7 +1947,7 @@ function renderCalendar() {
 
 
         /*
-          일정 클릭 → 수정
+          일정 위에서 드래그 시작 방지
         */
 
         eventElement.addEventListener(
@@ -1938,6 +1958,10 @@ function renderCalendar() {
           }
         );
 
+
+        /*
+          일정 클릭 → 수정
+        */
 
         eventElement.addEventListener(
           "click",
@@ -1971,7 +1995,9 @@ function renderCalendar() {
 
 
     /*
+      ======================================================
       날짜 클릭
+      ======================================================
     */
 
     day.addEventListener(
@@ -1994,41 +2020,23 @@ function renderCalendar() {
         }
 
 
-        const originalEvents =
+        const dayEventsNow =
           getEventsForDate(
             dateString
           );
 
 
         if (
-          originalEvents.length > 0
+          dayEventsNow.length > 0
         ) {
 
           /*
-            같은 제목이 여러 개면
-            색상 있는 것을 우선해서 수정.
+            여러 개면 첫 번째 일정 수정.
           */
 
-          const displayEvents =
-            getDisplayEvents(
-              dateString
-            );
-
-
-          if (
-            displayEvents.length > 0
-          ) {
-
-            openEditModal(
-              displayEvents[0]
-            );
-
-          } else {
-
-            openAddModal(
-              dateString
-            );
-          }
+          openEditModal(
+            dayEventsNow[0]
+          );
 
         } else {
 
@@ -2058,7 +2066,9 @@ function renderCalendar() {
   const remaining =
     (
       7 -
-      (totalCells % 7)
+      (
+        totalCells % 7
+      )
     ) % 7;
 
 
@@ -2106,9 +2116,9 @@ function changeMonth(
 
 
   /*
-    ★ 월 변경할 때마다
-    DB에서 가져온 events를 기준으로
-    renderCalendar()가 다시 색상을 계산한다.
+    현재 events 배열에 있는
+    DB 일정들을 기준으로
+    새 달을 다시 렌더링한다.
   */
 
   renderCalendar();
@@ -2157,13 +2167,17 @@ function getDateRange(
     );
 
 
-  if (start > end) {
+  if (
+    start > end
+  ) {
 
     const temp =
       start;
 
+
     start =
       end;
+
 
     end =
       temp;
@@ -2183,7 +2197,9 @@ function getDateRange(
   ) {
 
     result.push(
-      formatDate(cursor)
+      formatDate(
+        cursor
+      )
     );
 
 
@@ -2198,7 +2214,7 @@ function getDateRange(
 
 
 /* =========================================================
-   드래그 선택
+   드래그
 ========================================================= */
 
 function updateDragSelection() {
@@ -2382,7 +2398,9 @@ function finishDrag() {
 
 
   const dates =
-    [...selectedDates];
+    [
+      ...selectedDates
+    ];
 
 
   suppressNextClick =
@@ -2449,7 +2467,7 @@ function finishDrag() {
 
 
 /* =========================================================
-   pointerdown
+   드래그 시작
 ========================================================= */
 
 calendarGrid.addEventListener(
@@ -2462,8 +2480,8 @@ calendarGrid.addEventListener(
 
 
     /*
-      기존 일정 글씨 위에서
-      드래그하지 않음.
+      일정 자체를 누르면
+      수정으로 처리.
     */
 
     if (
@@ -2498,7 +2516,7 @@ calendarGrid.addEventListener(
 
 
 /* =========================================================
-   pointermove
+   드래그 이동
 ========================================================= */
 
 document.addEventListener(
@@ -2525,7 +2543,7 @@ document.addEventListener(
 
 
 /* =========================================================
-   pointerup
+   드래그 종료
 ========================================================= */
 
 document.addEventListener(
@@ -2644,7 +2662,7 @@ function openAddModal(
 
 
 /* =========================================================
-   여러 날짜 일정 추가
+   여러 날짜 추가
 ========================================================= */
 
 function openMultiAddModal(
@@ -2722,10 +2740,6 @@ function openMultiAddModal(
     .value =
     "";
 
-
-  /*
-    ★ 드래그 일정도 색상 선택 가능
-  */
 
   document
     .getElementById(
@@ -2841,8 +2855,7 @@ function openEditModal(
   document
     .getElementById(
       "deleteButton"
-    )
-    .style.display =
+    ).style.display =
     "block";
 
 
@@ -2926,7 +2939,7 @@ function closeLoginByBackground(
 
 
 /* =========================================================
-   ★ 일정 저장
+   일정 저장
 ========================================================= */
 
 async function saveEvent() {
@@ -2967,18 +2980,20 @@ async function saveEvent() {
       "일정 내용을 입력해주세요."
     );
 
+
     document
       .getElementById(
         "titleInput"
       )
       .focus();
 
+
     return;
   }
 
 
   /* =====================================================
-     기존 일정 수정
+     수정
   ===================================================== */
 
   if (editingEventId) {
@@ -3054,6 +3069,7 @@ async function saveEvent() {
 
       closeEventModal();
 
+
       renderCalendar();
 
 
@@ -3063,10 +3079,12 @@ async function saveEvent() {
 
       console.error(error);
 
+
       alert(
         "일정 수정에 실패했습니다.\n" +
         error.message
       );
+
 
       return;
     }
@@ -3082,10 +3100,6 @@ async function saveEvent() {
       ...selectedDates
     ];
 
-
-  /*
-    일반 단일 일정
-  */
 
   if (
     datesToSave.length === 0
@@ -3104,6 +3118,7 @@ async function saveEvent() {
       alert(
         "날짜를 선택해주세요."
       );
+
 
       return;
     }
@@ -3129,10 +3144,7 @@ async function saveEvent() {
 
 
   /*
-    ★ 여러 날짜에 같은 일정 생성
-
-    선택한 color도 모든 날짜에
-    동일하게 저장된다.
+    여러 날짜에 동일 일정 저장
   */
 
   const rows =
@@ -3184,11 +3196,13 @@ async function saveEvent() {
 
     closeEventModal();
 
+
     renderCalendar();
 
   } catch (error) {
 
     console.error(error);
+
 
     alert(
       "일정 저장에 실패했습니다.\n" +
@@ -3267,11 +3281,13 @@ async function deleteEvent() {
 
     closeEventModal();
 
+
     renderCalendar();
 
   } catch (error) {
 
     console.error(error);
+
 
     alert(
       "일정 삭제에 실패했습니다.\n" +
@@ -3290,7 +3306,7 @@ document.addEventListener(
   event => {
 
     /*
-      일정 모달 Enter
+      일정 저장 Enter
     */
 
     if (
@@ -3314,6 +3330,7 @@ document.addEventListener(
       ) {
 
         event.preventDefault();
+
 
         saveEvent();
       }
@@ -3345,6 +3362,7 @@ document.addEventListener(
       ) {
 
         event.preventDefault();
+
 
         login();
       }
@@ -3392,14 +3410,15 @@ document.addEventListener(
 
 
 /* =========================================================
-   Supabase 인증 변화
+   인증 상태 변화
 ========================================================= */
 
 supabaseClient.auth.onAuthStateChange(
   (_event, session) => {
 
     currentUser =
-      session?.user || null;
+      session?.user ||
+      null;
 
 
     updateAuthUI();
@@ -3408,7 +3427,7 @@ supabaseClient.auth.onAuthStateChange(
 
 
 /* =========================================================
-   초기 실행
+   초기화
 ========================================================= */
 
 async function init() {
