@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>루다의 캘린더</title>
+  <title>루다의 일정표</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -13,1001 +13,915 @@
       box-sizing: border-box;
     }
 
+    html,
     body {
       margin: 0;
-      min-height: 100vh;
-      padding: 30px 15px 50px;
-
+      padding: 0;
+      background: #f7f7f7;
+      color: #222;
       font-family:
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
-        "Noto Sans KR",
+        "Malgun Gothic",
         sans-serif;
-
-      color: #333;
-
-      background:
-        linear-gradient(
-          135deg,
-          #eee7ff 0%,
-          #f8f5ff 45%,
-          #f0ecff 100%
-        );
     }
 
-    .container {
-      width: min(1100px, 100%);
-      margin: 0 auto;
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
     }
 
-
-    /* =====================================================
-       상단
-    ===================================================== */
-
-    .top-card {
-      padding: 28px 30px;
-      margin-bottom: 18px;
-
-      color: white;
-
-      background:
-        linear-gradient(
-          135deg,
-          #8d6bea,
-          #6f55d9
-        );
-
-      border-radius: 24px;
-
-      box-shadow:
-        0 12px 30px rgba(105, 76, 190, 0.22);
-    }
-
-    .top-card h1 {
-      margin: 0;
-
-      font-size: 28px;
-      font-weight: 800;
-    }
-
-    .top-card p {
-      margin: 8px 0 0;
-
-      font-size: 14px;
-
-      opacity: 0.9;
-    }
-
-
-    /* =====================================================
-       로그인
-    ===================================================== */
-
-    .info-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      gap: 10px;
-
-      padding: 13px 18px;
-      margin-bottom: 18px;
-
-      background: rgba(255,255,255,0.92);
-
-      border-radius: 16px;
-
-      box-shadow:
-        0 5px 18px rgba(80,60,120,0.08);
-
-      flex-wrap: wrap;
-    }
-
-    .login-status {
-      font-size: 13px;
-      color: #777;
-    }
-
-    .login-btn {
-      padding: 9px 16px;
-
-      border: 0;
-      border-radius: 10px;
-
-      background: #7659df;
-      color: white;
-
+    button {
       cursor: pointer;
-
-      font-weight: 700;
     }
 
-    .login-btn:hover {
-      background: #6548ce;
+    /* =========================
+       전체
+    ========================= */
+
+    .app {
+      width: min(1500px, 96%);
+      margin: 25px auto 50px;
     }
 
+    /* =========================
+       상단
+    ========================= */
 
-    /* =====================================================
-       에러
-    ===================================================== */
-
-    .error-box {
-      display: none;
-
-      padding: 12px 15px;
-      margin-bottom: 15px;
-
-      background: #fff0f2;
-      color: #c44961;
-
-      border: 1px solid #ffd0d8;
-      border-radius: 12px;
-
-      font-size: 13px;
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 15px;
     }
 
-
-    /* =====================================================
-       캘린더
-    ===================================================== */
-
-    .calendar-card {
-      overflow: hidden;
-
-      padding: 22px;
-
-      background: white;
-
-      border-radius: 24px;
-
-      box-shadow:
-        0 12px 35px rgba(80,60,120,0.10);
-    }
-
-    .calendar-header {
+    .brand {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-
-      gap: 10px;
-
-      margin-bottom: 18px;
+      gap: 12px;
     }
 
-    .month-title {
-      color: #4b3c73;
-
+    .mark {
+      width: 45px;
+      height: 45px;
+      border-radius: 13px;
+      background: #222;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 23px;
       font-weight: 800;
     }
 
-    .calendar-buttons {
+    .brand h1 {
+      margin: 0;
+      font-size: 23px;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      color: #888;
+      font-size: 13px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .top-btn {
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 10px;
+      padding: 9px 13px;
+      font-weight: 700;
+    }
+
+    .top-btn:hover {
+      background: #f3f3f3;
+    }
+
+    .admin-badge {
+      display: none;
+      background: #222;
+      color: white;
+      border-radius: 10px;
+      padding: 9px 13px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* =========================
+       레이아웃
+    ========================= */
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 270px;
+      gap: 18px;
+    }
+
+    .calendar-card,
+    .side {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 18px;
+    }
+
+    .calendar-card {
+      overflow: hidden;
+    }
+
+    /* =========================
+       월 헤더
+    ========================= */
+
+    .monthhead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 22px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .monthtitle {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      font-weight: 800;
+    }
+
+    .monthtitle .year {
+      font-size: 18px;
+      color: #777;
+    }
+
+    .monthtitle .month {
+      font-size: 30px;
+    }
+
+    .monthtitle .kr {
+      font-size: 18px;
+      color: #777;
+    }
+
+    .monthnav {
       display: flex;
       gap: 7px;
     }
 
-    .calendar-buttons button {
-      width: 38px;
-      height: 36px;
-
-      padding: 0;
-
-      border: 0;
+    .iconbtn {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #ddd;
+      background: white;
       border-radius: 10px;
-
-      background: #f1edff;
-      color: #6650a5;
-
-      cursor: pointer;
-
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 23px;
+      line-height: 1;
     }
 
-    .calendar-buttons button:hover {
-      background: #e4dcff;
+    .iconbtn:hover {
+      background: #f5f5f5;
     }
 
-    .calendar-buttons .today-btn {
-      width: auto;
-
-      padding: 0 13px;
-
-      font-size: 13px;
-    }
-
-
-    /* =====================================================
+    /* =========================
        요일
-    ===================================================== */
+    ========================= */
 
-    .weekday-row {
+    .weekdays {
       display: grid;
-
-      grid-template-columns:
-        repeat(7, 1fr);
-
+      grid-template-columns: repeat(7, 1fr);
       border-bottom: 1px solid #eee;
     }
 
     .weekday {
-      padding: 10px 3px;
-
       text-align: center;
-
-      color: #777;
-
+      padding: 12px 4px;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
+      color: #777;
     }
 
-    .weekday.saturday {
-      color: #6384d8;
+    .weekday.sat {
+      color: #5482c8;
     }
 
-    .weekday.sunday {
-      color: #e56b83;
+    .weekday.sun {
+      color: #d46b6b;
     }
 
+    /* =========================
+       달력
+    ========================= */
 
-    /* =====================================================
-       달력 그리드
-    ===================================================== */
-
-    .calendar-grid {
+    .grid {
       display: grid;
-
-      grid-template-columns:
-        repeat(7, 1fr);
-
-      border-left: 1px solid #eee;
-      border-top: 1px solid #eee;
-
-      user-select: none;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
     }
-
-    .calendar-grid.dragging {
-      cursor: crosshair;
-      user-select: none;
-    }
-
-    .empty-cell {
-      min-height: 125px;
-
-      background: #fafafa;
-
-      border-right: 1px solid #eee;
-      border-bottom: 1px solid #eee;
-    }
-
-
-    /* =====================================================
-       날짜 칸
-    ===================================================== */
 
     .day {
       position: relative;
-
-      min-height: 125px;
-
-      padding: 8px;
-
-      overflow: hidden;
-
-      background: white;
-
+      min-height: 145px;
       border-right: 1px solid #eee;
       border-bottom: 1px solid #eee;
-
-      cursor: default;
-
-      transition:
-        background 0.12s ease,
-        box-shadow 0.12s ease;
+      padding: 8px;
+      cursor: pointer;
+      background: white;
     }
 
-    .day.admin-day {
-      cursor: crosshair;
+    .day:nth-child(7n) {
+      border-right: 0;
     }
 
     .day:hover {
-      background: #faf8ff;
+      background: #fafafa;
     }
 
-
-    /* 오늘 */
+    .day.muted {
+      background: #fafafa;
+      color: #bbb;
+    }
 
     .day.today {
-      box-shadow:
-        inset 0 0 0 2px #8b6de8;
+      background: #fffdf5;
     }
 
-
-    /* =====================================================
-       날짜 숫자
-    ===================================================== */
-
-    .day-number {
-      position: relative;
-
-      z-index: 5;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      width: 28px;
-      height: 28px;
-
-      margin-bottom: 5px;
-
-      border-radius: 50%;
-
-      color: #555;
-
+    .date {
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
+      margin-bottom: 7px;
     }
 
-    .day.saturday .day-number {
-      color: #5f7fd0;
+    .day.sat .date {
+      color: #5482c8;
     }
 
-    .day.sunday .day-number {
-      color: #df6179;
+    .day.sun .date {
+      color: #d46b6b;
     }
 
-    .day.today .day-number {
-      background: #7c60dc;
-      color: white;
-    }
-
-
-    /* =====================================================
-       ★ 일정 1개일 때만 날짜 칸 전체 색상
-    ===================================================== */
-
-    .day.single-colored-gray {
-      background: #e7e7eb;
-    }
-
-    .day.single-colored-green {
-      background: #d7f0dc;
-    }
-
-    .day.single-colored-yellow {
-      background: #fff0b3;
-    }
-
-    .day.single-colored-purple {
-      background: #e6dcff;
-    }
-
-
-    .day.single-colored-gray:hover {
-      background: #dfdfe3;
-    }
-
-    .day.single-colored-green:hover {
-      background: #cde9d3;
-    }
-
-    .day.single-colored-yellow:hover {
-      background: #ffe9a1;
-    }
-
-    .day.single-colored-purple:hover {
-      background: #ddd1f8;
-    }
-
-
-    /* =====================================================
+    /* =========================
        일정 영역
-    ===================================================== */
+    ========================= */
 
     .events {
-      position: relative;
-
-      z-index: 4;
-
       display: flex;
       flex-direction: column;
-
-      gap: 4px;
+      gap: 5px;
     }
 
+    /*
+      일정 여러 개일 때 드래그 가능
+    */
+
     .event {
-      display: block;
-
-      padding: 4px 6px;
-
-      border-radius: 6px;
+      position: relative;
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 7px;
 
       font-size: 12px;
       line-height: 1.35;
+      font-weight: 700;
 
-      font-weight: 600;
-
-      word-break: break-word;
       white-space: pre-line;
+      overflow-wrap: anywhere;
+
+      user-select: none;
 
       cursor: pointer;
+
+      transition:
+        opacity 0.15s,
+        transform 0.15s,
+        box-shadow 0.15s;
     }
 
-
-    /* =====================================================
-       ★ 여러 일정 / 색상 없음
-       → 글자 부분만 색칠
-    ===================================================== */
-
-    .event.no-color {
-      background: #f3f1f7;
-
-      color: #4e485c;
-
-      border:
-        1px solid #e2dfea;
+    .event:hover {
+      filter: brightness(0.97);
     }
-
 
     /*
-      색상 일정이지만
-      여러 개가 있는 경우
-
-      → 각각 글자 부분만 색칠
+      관리자일 때만 드래그 커서
     */
 
-    .event.multi-gray {
-      background: rgba(120,120,130,0.20);
-
-      color: #4e4e55;
+    body.admin-mode .event {
+      cursor: grab;
     }
 
-    .event.multi-green {
-      background: rgba(72,160,94,0.20);
-
-      color: #317340;
+    body.admin-mode .event:active {
+      cursor: grabbing;
     }
 
-    .event.multi-yellow {
-      background: rgba(235,183,44,0.24);
+    /*
+      드래그 중
+    */
 
-      color: #866817;
+    .event.dragging {
+      opacity: 0.35;
+      transform: scale(0.98);
     }
 
-    .event.multi-purple {
-      background: rgba(126,91,210,0.20);
+    /*
+      드래그해서 들어갈 위치
+    */
 
-      color: #6843a7;
-    }
-
-
-    /* =====================================================
-       드래그 선택
-    ===================================================== */
-
-    .day.drag-selected {
-      background: #dcd1ff !important;
-
+    .event.drag-over {
       box-shadow:
-        inset 0 0 0 2px #8567e5;
+        0 -3px 0 #222;
     }
 
-    .day.drag-selected .day-number {
-      background: #8062df;
+    /*
+      색상
+    */
 
-      color: white;
+    .event.gray {
+      background: #e3e3e3;
+      color: #444;
     }
 
-    .day.drag-anchor {
-      box-shadow:
-        inset 0 0 0 3px #6848d0;
+    .event.green {
+      background: #dcebd5;
+      color: #355a31;
     }
 
+    .event.yellow {
+      background: #fff0c5;
+      color: #66521b;
+    }
 
-    /* =====================================================
-       모달
-    ===================================================== */
+    .event.pink {
+      background: #f5dce1;
+      color: #693c46;
+    }
 
-    .modal-bg {
-      display: none;
+    .event.blue {
+      background: #dbe7f8;
+      color: #355278;
+    }
 
-      position: fixed;
+    .event.purple {
+      background: #e7ddf5;
+      color: #57416e;
+    }
 
-      inset: 0;
+    /* =========================
+       사이드
+    ========================= */
 
-      z-index: 1000;
-
-      align-items: center;
-      justify-content: center;
-
+    .side {
       padding: 20px;
-
-      background:
-        rgba(30, 20, 50, 0.45);
-
-      backdrop-filter: blur(3px);
+      height: fit-content;
     }
 
-    .modal-bg.show {
+    .side-section {
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .side-section:last-child {
+      border-bottom: 0;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .muted {
+      color: #999;
+      font-size: 13px;
+    }
+
+    .bigdate {
+      margin-top: 4px;
+      font-size: 29px;
+      font-weight: 800;
+    }
+
+    .side h2 {
+      margin: 0 0 12px;
+      font-size: 17px;
+    }
+
+    .eventrow {
       display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 7px 0;
     }
 
-    .modal {
-      width: min(440px, 100%);
-
-      padding: 24px;
-
-      background: white;
-
-      border-radius: 20px;
-
-      box-shadow:
-        0 20px 60px rgba(40,25,70,0.25);
+    .eventrow .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-top: 6px;
+      flex: 0 0 auto;
     }
 
-    .modal h2 {
-      margin: 0 0 18px;
-
-      color: #4d3d72;
-
-      font-size: 21px;
+    .dot.gray {
+      background: #aaa;
     }
 
-    .form-group {
-      margin-bottom: 15px;
+    .dot.green {
+      background: #87b87d;
     }
 
-    .form-group label {
+    .dot.yellow {
+      background: #e3c56d;
+    }
+
+    .dot.pink {
+      background: #c98594;
+    }
+
+    .dot.blue {
+      background: #7da0ce;
+    }
+
+    .dot.purple {
+      background: #a185c2;
+    }
+
+    .eventrow strong {
       display: block;
-
-      margin-bottom: 7px;
-
-      color: #625b6e;
-
       font-size: 13px;
-      font-weight: 700;
+      line-height: 1.4;
     }
 
-    .form-group input,
-    .form-group select {
+    .eventrow span {
+      display: block;
+      margin-top: 2px;
+      color: #999;
+      font-size: 11px;
+    }
+
+    .add {
       width: 100%;
-
-      padding: 11px 12px;
-
-      outline: none;
-
-      border:
-        1px solid #ddd7e7;
-
+      border: 0;
+      background: #222;
+      color: white;
       border-radius: 10px;
-
-      background: white;
-
-      font-size: 14px;
+      padding: 11px;
+      font-weight: 800;
     }
 
-    .form-group input:focus,
-    .form-group select:focus {
-      border-color: #8568dc;
-
-      box-shadow:
-        0 0 0 3px rgba(133,104,220,0.10);
+    .add:hover {
+      background: #333;
     }
 
-    .range-info {
-      padding: 11px 13px;
-
-      color: #644fa4;
-
-      background: #f4f0ff;
-
-      border:
-        1px solid #e4dcff;
-
-      border-radius: 11px;
-
-      font-size: 13px;
-
+    .hint {
+      margin-top: 10px;
+      color: #999;
+      font-size: 11px;
       line-height: 1.5;
     }
 
-    .range-info strong {
-      color: #4e3a88;
-    }
+    /* =========================
+       로그인 모달
+    ========================= */
 
-    .modal-buttons {
-      display: flex;
-
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: center;
 
-      gap: 8px;
-
-      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.42);
+      z-index: 1000;
+      padding: 20px;
     }
 
-    .modal-buttons button {
-      padding: 10px 16px;
+    .dialog {
+      width: min(430px, 100%);
+      background: white;
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
 
-      border: 0;
-      border-radius: 10px;
+    .dialog h3 {
+      margin: 0 0 20px;
+      font-size: 21px;
+    }
 
-      cursor: pointer;
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
 
+    .form label {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      font-size: 13px;
       font-weight: 700;
     }
 
-    .cancel-btn {
-      background: #f1eff4;
-      color: #68636f;
+    .form input,
+    .form textarea,
+    .form select {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      padding: 11px;
+      outline: none;
+      background: white;
     }
 
-    .save-btn {
-      background: #7659df;
+    .form textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form input:focus,
+    .form textarea:focus,
+    .form select:focus {
+      border-color: #888;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 5px;
+    }
+
+    .cancel,
+    .save {
+      border-radius: 9px;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      font-weight: 700;
+    }
+
+    .cancel {
+      background: white;
+    }
+
+    .save {
+      background: #222;
       color: white;
+      border-color: #222;
     }
 
-    .delete-btn {
-      margin-right: auto;
+    /* =========================
+       로그인 상태
+    ========================= */
 
-      background: #fff0f2;
-      color: #d05268;
+    .login-info {
+      display: none;
+      align-items: center;
+      gap: 7px;
     }
 
+    body.admin-mode .login-info {
+      display: flex;
+    }
 
-    /* =====================================================
+    /* =========================
        모바일
-    ===================================================== */
+    ========================= */
 
-    @media (max-width: 700px) {
-
-      body {
-        padding: 15px 8px 35px;
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
       }
 
-      .top-card {
-        padding: 22px 20px;
-        border-radius: 18px;
+      .side {
+        display: none;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .app {
+        width: 100%;
+        margin: 0;
       }
 
-      .top-card h1 {
-        font-size: 23px;
+      .topbar {
+        padding: 14px;
+        margin-bottom: 0;
       }
 
-      .calendar-card {
-        padding: 10px;
-        border-radius: 18px;
-      }
-
-      .calendar-header {
-        padding: 6px 4px;
-      }
-
-      .month-title {
+      .brand h1 {
         font-size: 18px;
       }
 
-      .weekday {
-        padding: 8px 1px;
-        font-size: 11px;
+      .brand p {
+        display: none;
       }
 
-      .day,
-      .empty-cell {
-        min-height: 92px;
+      .mark {
+        width: 38px;
+        height: 38px;
+        font-size: 20px;
+      }
+
+      .calendar-card {
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+      }
+
+      .monthhead {
+        padding: 15px;
+      }
+
+      .monthtitle .month {
+        font-size: 25px;
       }
 
       .day {
+        min-height: 105px;
         padding: 5px;
       }
 
-      .day-number {
-        width: 23px;
-        height: 23px;
+      .event {
+        font-size: 10px;
+        padding: 5px;
+      }
+
+      .date {
         font-size: 11px;
       }
 
-      .event {
-        padding: 4px 5px;
-
-        border-radius: 5px;
-
-        font-size: 10px;
+      .top-btn {
+        padding: 8px 10px;
       }
     }
-
   </style>
 </head>
 
-
 <body>
 
-<div class="container">
+<div class="app">
 
-
-  <!-- =====================================================
+  <!-- =========================
        상단
-  ====================================================== -->
+  ========================= -->
 
-  <div class="top-card">
+  <div class="topbar">
 
-    <h1>
-      루다의 캘린더
-    </h1>
+    <div class="brand">
+      <div class="mark">L</div>
 
-    <p>
-      일정을 한눈에 확인해보세요 ✨
-    </p>
-
-  </div>
-
-
-  <!-- =====================================================
-       로그인 상태
-  ====================================================== -->
-
-  <div class="info-bar">
-
-    <div
-      class="login-status"
-      id="loginStatus"
-    >
-      공개 캘린더 · 누구나 일정 확인 가능
+      <div>
+        <h1>루다의 일정표</h1>
+        <p>일정은 한눈에, 기록은 가볍게</p>
+      </div>
     </div>
 
+    <div class="top-actions">
 
-    <button
-      class="login-btn"
-      id="loginButton"
-      onclick="openLoginModal()"
-    >
-      관리자 로그인
-    </button>
+      <div class="login-info">
+        <div class="admin-badge" id="adminBadge">
+          관리자
+        </div>
+
+        <button
+          class="top-btn"
+          onclick="logout()"
+        >
+          로그아웃
+        </button>
+      </div>
+
+      <button
+        class="top-btn"
+        id="loginButton"
+        onclick="openLoginModal()"
+      >
+        관리자 로그인
+      </button>
+
+      <button
+        class="top-btn"
+        onclick="goToday()"
+      >
+        오늘
+      </button>
+
+      <button
+        class="top-btn"
+        onclick="openAddModal()"
+      >
+        ＋ 일정
+      </button>
+
+    </div>
 
   </div>
 
 
-  <!-- 에러 -->
+  <!-- =========================
+       달력
+  ========================= -->
 
-  <div
-    id="errorBox"
-    class="error-box"
-  ></div>
+  <div class="layout">
 
+    <main class="calendar-card">
 
-  <!-- =====================================================
-       캘린더
-  ====================================================== -->
+      <div class="monthhead">
 
-  <div class="calendar-card">
+        <div class="monthtitle">
+          <span class="year" id="year"></span>
+          <span class="month" id="month"></span>
+          <span class="kr">월</span>
+        </div>
 
+        <div class="monthnav">
 
-    <div class="calendar-header">
+          <button
+            class="iconbtn"
+            onclick="moveMonth(-1)"
+          >
+            ‹
+          </button>
+
+          <button
+            class="iconbtn"
+            onclick="moveMonth(1)"
+          >
+            ›
+          </button>
+
+        </div>
+
+      </div>
+
 
       <div
-        class="month-title"
-        id="monthTitle"
-      ></div>
+        class="weekdays"
+        id="weekdays"
+      >
+      </div>
 
 
-      <div class="calendar-buttons">
+      <div
+        class="grid"
+        id="grid"
+      >
+      </div>
+
+    </main>
+
+
+    <!-- =========================
+         사이드
+    ========================= -->
+
+    <aside class="side">
+
+      <div class="side-section">
+
+        <div
+          class="muted"
+          id="selectedLabel"
+        >
+          선택한 날짜
+        </div>
+
+        <div
+          class="bigdate"
+          id="selectedDate"
+        >
+          10.01
+        </div>
+
+      </div>
+
+
+      <div class="side-section">
+
+        <h2>
+          이번 달 일정
+        </h2>
+
+        <div id="upcoming">
+        </div>
+
+      </div>
+
+
+      <div class="side-section">
 
         <button
-          onclick="changeMonth(-1)"
+          class="add"
+          onclick="openAddModal()"
         >
-          ‹
+          ＋ 일정 추가
         </button>
 
-
-        <button
-          class="today-btn"
-          onclick="goToday()"
-        >
-          오늘
-        </button>
-
-
-        <button
-          onclick="changeMonth(1)"
-        >
-          ›
-        </button>
+        <div class="hint">
+          날짜 칸을 클릭해도 일정을 추가할 수 있어요.<br>
+          관리자 로그인 후 같은 날짜의 일정을<br>
+          마우스로 잡아 위아래로 움직일 수 있어요.
+        </div>
 
       </div>
 
-    </div>
-
-
-    <!-- 요일 -->
-
-    <div class="weekday-row">
-
-      <div class="weekday">
-        월
-      </div>
-
-      <div class="weekday">
-        화
-      </div>
-
-      <div class="weekday">
-        수
-      </div>
-
-      <div class="weekday">
-        목
-      </div>
-
-      <div class="weekday">
-        금
-      </div>
-
-      <div class="weekday saturday">
-        토
-      </div>
-
-      <div class="weekday sunday">
-        일
-      </div>
-
-    </div>
-
-
-    <!-- 날짜 -->
-
-    <div
-      class="calendar-grid"
-      id="calendarGrid"
-    ></div>
-
+    </aside>
 
   </div>
 
 </div>
 
 
-
-<!-- =======================================================
-     일정 추가 / 수정 모달
-======================================================= -->
+<!-- =========================
+     일정 추가 / 수정
+========================= -->
 
 <div
-  class="modal-bg"
-  id="eventModalBg"
-  onclick="closeModalByBackground(event)"
+  class="modal"
+  id="eventModal"
 >
 
-  <div class="modal">
+  <div class="dialog">
 
-
-    <h2 id="eventModalTitle">
+    <h3 id="eventModalTitle">
       일정 추가
-    </h2>
+    </h3>
 
-
-    <!-- 단일 날짜 -->
-
-    <div
-      class="form-group"
-      id="singleDateGroup"
-    >
+    <div class="form">
 
       <label>
         날짜
+
+        <input
+          type="date"
+          id="eventDate"
+        >
       </label>
 
-      <input
-        type="date"
-        id="dateInput"
-      >
-
-    </div>
-
-
-    <!-- 여러 날짜 -->
-
-    <div
-      class="form-group"
-      id="rangeDateGroup"
-      style="display:none;"
-    >
 
       <label>
-        선택한 날짜
+        일정 내용
+
+        <textarea
+          id="eventText"
+          placeholder="예: 휴방&#10;루다극장&#10;게임"
+        ></textarea>
+
       </label>
 
-      <div
-        class="range-info"
-        id="rangeInfo"
-      ></div>
-
-    </div>
-
-
-    <!-- 일정 -->
-
-    <div class="form-group">
-
-      <label>
-        일정
-      </label>
-
-      <input
-        type="text"
-        id="titleInput"
-        placeholder="일정 내용을 입력하세요"
-        autocomplete="off"
-      >
-
-    </div>
-
-
-    <!-- 색상 -->
-
-    <div class="form-group">
 
       <label>
         색상
+
+        <select id="eventColor">
+
+          <option value="gray">
+            회색
+          </option>
+
+          <option value="green">
+            연두
+          </option>
+
+          <option value="yellow">
+            노랑
+          </option>
+
+          <option value="pink">
+            분홍
+          </option>
+
+          <option value="blue">
+            파랑
+          </option>
+
+          <option value="purple">
+            보라
+          </option>
+
+        </select>
+
       </label>
 
-      <select id="colorInput">
 
-        <option value="">
-          색상 없음
-        </option>
+      <div class="actions">
 
-        <option value="gray">
-          회색
-        </option>
+        <button
+          class="cancel"
+          onclick="closeEventModal()"
+        >
+          취소
+        </button>
 
-        <option value="green">
-          초록색
-        </option>
+        <button
+          class="save"
+          onclick="saveEvent()"
+        >
+          저장
+        </button>
 
-        <option value="yellow">
-          노란색
-        </option>
-
-        <option value="purple">
-          보라색
-        </option>
-
-      </select>
-
-    </div>
-
-
-    <!-- 버튼 -->
-
-    <div class="modal-buttons">
-
-      <button
-        class="delete-btn"
-        id="deleteButton"
-        onclick="deleteEvent()"
-        style="display:none;"
-      >
-        삭제
-      </button>
-
-
-      <button
-        class="cancel-btn"
-        onclick="closeEventModal()"
-      >
-        취소
-      </button>
-
-
-      <button
-        class="save-btn"
-        onclick="saveEvent()"
-      >
-        저장
-      </button>
+      </div>
 
     </div>
 
@@ -1016,99 +930,76 @@
 </div>
 
 
-
-<!-- =======================================================
-     로그인 모달
-======================================================= -->
+<!-- =========================
+     로그인
+========================= -->
 
 <div
-  class="modal-bg"
-  id="loginModalBg"
-  onclick="closeLoginByBackground(event)"
+  class="modal"
+  id="loginModal"
 >
 
-  <div class="modal">
+  <div class="dialog">
 
-
-    <h2>
+    <h3>
       관리자 로그인
-    </h2>
+    </h3>
 
-
-    <div
-      style="
-        margin-bottom:15px;
-        color:#777;
-        font-size:13px;
-        line-height:1.5;
-      "
-    >
-      로그인하면 일정을 추가하거나
-      수정하고 삭제할 수 있습니다.
-    </div>
-
-
-    <div class="form-group">
+    <div class="form">
 
       <label>
         이메일
+
+        <input
+          type="email"
+          id="emailInput"
+          placeholder="관리자 이메일"
+          autocomplete="username"
+        >
       </label>
 
-      <input
-        type="email"
-        id="emailInput"
-        placeholder="이메일"
-        autocomplete="email"
-      >
-
-    </div>
-
-
-    <div class="form-group">
 
       <label>
         비밀번호
+
+        <input
+          type="password"
+          id="passwordInput"
+          placeholder="비밀번호"
+          autocomplete="current-password"
+        >
       </label>
 
-      <input
-        type="password"
-        id="passwordInput"
-        placeholder="비밀번호"
-        autocomplete="current-password"
-      >
 
-    </div>
+      <div class="actions">
 
+        <button
+          class="cancel"
+          onclick="closeLoginModal()"
+        >
+          취소
+        </button>
 
-    <div class="modal-buttons">
+        <button
+          class="save"
+          onclick="login()"
+        >
+          로그인
+        </button>
 
-      <button
-        class="cancel-btn"
-        onclick="closeLoginModal()"
-      >
-        취소
-      </button>
-
-
-      <button
-        class="save-btn"
-        onclick="login()"
-      >
-        로그인
-      </button>
+      </div>
 
     </div>
 
   </div>
 
 </div>
-
 
 
 <script>
 
 /* =========================================================
-   Supabase
+   SUPABASE
 ========================================================= */
 
 const SUPABASE_URL =
@@ -1128,222 +1019,132 @@ const supabaseClient =
    상태
 ========================================================= */
 
+let currentUser = null;
+
+let events = [];
+
 let currentDate =
-  new Date();
+  new Date(2026, 9, 1);
 
-let events =
-  [];
+let selectedDate =
+  new Date(2026, 9, 1);
 
-let currentUser =
-  null;
+let editingId = null;
 
-let editingEventId =
-  null;
-
-
-/* 드래그 상태 */
-
-let isDragging =
-  false;
-
-let dragStartDate =
-  null;
-
-let dragCurrentDate =
-  null;
-
-let selectedDates =
-  [];
-
-let suppressNextClick =
-  false;
-
-
-/* =========================================================
-   DOM
-========================================================= */
-
-const monthTitle =
-  document.getElementById(
-    "monthTitle"
-  );
-
-const calendarGrid =
-  document.getElementById(
-    "calendarGrid"
-  );
-
-const errorBox =
-  document.getElementById(
-    "errorBox"
-  );
-
-const loginStatus =
-  document.getElementById(
-    "loginStatus"
-  );
-
-const loginButton =
-  document.getElementById(
-    "loginButton"
-  );
-
-
-/* =========================================================
-   공통
-========================================================= */
-
-function showError(
-  message
-) {
-
-  errorBox.textContent =
-    message;
-
-  errorBox.style.display =
-    "block";
-}
-
-
-function clearError() {
-
-  errorBox.textContent =
-    "";
-
-  errorBox.style.display =
-    "none";
-}
+let draggedEventId = null;
 
 
 /* =========================================================
    날짜
 ========================================================= */
 
-function formatDate(
-  date
-) {
+function dateKey(date) {
 
-  const year =
+  const y =
     date.getFullYear();
 
+  const m =
+    String(date.getMonth() + 1)
+      .padStart(2, "0");
 
-  const month =
-    String(
-      date.getMonth() + 1
-    ).padStart(
-      2,
-      "0"
-    );
+  const d =
+    String(date.getDate())
+      .padStart(2, "0");
 
-
-  const day =
-    String(
-      date.getDate()
-    ).padStart(
-      2,
-      "0"
-    );
-
-
-  return (
-    `${year}-${month}-${day}`
-  );
-}
-
-
-function parseLocalDate(
-  dateString
-) {
-
-  const parts =
-    dateString
-      .split("-")
-      .map(Number);
-
-
-  return new Date(
-    parts[0],
-    parts[1] - 1,
-    parts[2]
-  );
-}
-
-
-function getEventsForDate(
-  dateString
-) {
-
-  return events.filter(
-    event =>
-      event.date ===
-      dateString
-  );
+  return `${y}-${m}-${d}`;
 }
 
 
 /* =========================================================
-   인증
+   HTML escape
+========================================================= */
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+
+/* =========================================================
+   줄바꿈
+========================================================= */
+
+function formatText(value) {
+
+  return escapeHtml(value)
+    .replaceAll("\n", "<br>");
+}
+
+
+/* =========================================================
+   로그인 상태 확인
 ========================================================= */
 
 async function checkAuth() {
 
-  try {
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.auth.getSession();
 
-    const {
-      data: {
-        session
-      }
-    } =
-      await supabaseClient
-        .auth
-        .getSession();
-
-
-    currentUser =
-      session?.user ||
-      null;
-
-
-    updateAuthUI();
-
-  } catch (error) {
+  if (error) {
 
     console.error(error);
+
+    return;
+
   }
+
+  currentUser =
+    data.session?.user || null;
+
+  updateAuthUI();
 }
 
+
+/* =========================================================
+   로그인 UI
+========================================================= */
 
 function updateAuthUI() {
 
   if (currentUser) {
 
-    loginStatus.textContent =
-      "관리자 로그인 상태 · 일정 추가/수정/삭제 가능";
+    document.body.classList.add(
+      "admin-mode"
+    );
 
+    document.getElementById(
+      "loginButton"
+    ).style.display = "none";
 
-    loginButton.textContent =
-      "로그아웃";
-
-
-    loginButton.onclick =
-      logout;
+    document.getElementById(
+      "adminBadge"
+    ).style.display = "block";
 
   } else {
 
-    loginStatus.textContent =
-      "공개 캘린더 · 누구나 일정 확인 가능";
+    document.body.classList.remove(
+      "admin-mode"
+    );
 
+    document.getElementById(
+      "loginButton"
+    ).style.display = "block";
 
-    loginButton.textContent =
-      "관리자 로그인";
+    document.getElementById(
+      "adminBadge"
+    ).style.display = "none";
 
-
-    loginButton.onclick =
-      openLoginModal;
   }
 
-
-  renderCalendar();
+  render();
 }
 
 
@@ -1351,76 +1152,26 @@ function updateAuthUI() {
    로그인
 ========================================================= */
 
-function openLoginModal() {
-
-  document
-    .getElementById(
-      "loginModalBg"
-    )
-    .classList.add(
-      "show"
-    );
-
-
-  setTimeout(
-    () => {
-
-      document
-        .getElementById(
-          "emailInput"
-        )
-        .focus();
-
-    },
-    100
-  );
-}
-
-
-function closeLoginModal() {
-
-  document
-    .getElementById(
-      "loginModalBg"
-    )
-    .classList.remove(
-      "show"
-    );
-}
-
-
 async function login() {
 
-  clearError();
-
-
   const email =
-    document
-      .getElementById(
-        "emailInput"
-      )
-      .value
-      .trim();
-
+    document.getElementById(
+      "emailInput"
+    ).value.trim();
 
   const password =
-    document
-      .getElementById(
-        "passwordInput"
-      )
-      .value;
+    document.getElementById(
+      "passwordInput"
+    ).value;
 
-
-  if (
-    !email ||
-    !password
-  ) {
+  if (!email || !password) {
 
     alert(
       "이메일과 비밀번호를 입력해주세요."
     );
 
     return;
+
   }
 
 
@@ -1430,33 +1181,27 @@ async function login() {
       data,
       error
     } =
-      await supabaseClient
-        .auth
+      await supabaseClient.auth
         .signInWithPassword({
           email,
           password
         });
 
-
     if (error) {
+
       throw error;
+
     }
 
 
     currentUser =
       data.user;
 
-
     closeLoginModal();
 
-
-    document
-      .getElementById(
-        "passwordInput"
-      )
-      .value =
-      "";
-
+    document.getElementById(
+      "passwordInput"
+    ).value = "";
 
     updateAuthUI();
 
@@ -1464,40 +1209,59 @@ async function login() {
 
     console.error(error);
 
-
     alert(
-      "로그인에 실패했습니다.\n" +
+      "로그인에 실패했습니다.\n\n" +
       error.message
     );
+
   }
+
 }
 
+
+/* =========================================================
+   로그아웃
+========================================================= */
 
 async function logout() {
 
-  try {
+  const {
+    error
+  } =
+    await supabaseClient.auth.signOut();
 
-    await supabaseClient
-      .auth
-      .signOut();
+  if (error) {
 
+    alert(
+      "로그아웃에 실패했습니다.\n" +
+      error.message
+    );
+
+    return;
+
+  }
+
+  currentUser = null;
+
+  updateAuthUI();
+
+}
+
+
+/* =========================================================
+   Auth 변화 감지
+========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+  (_event, session) => {
 
     currentUser =
-      null;
-
+      session?.user || null;
 
     updateAuthUI();
 
-  } catch (error) {
-
-    console.error(error);
-
-
-    alert(
-      "로그아웃 중 오류가 발생했습니다."
-    );
   }
-}
+);
 
 
 /* =========================================================
@@ -1506,161 +1270,162 @@ async function logout() {
 
 async function loadEvents() {
 
-  clearError();
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("events")
+      .select("*")
+      .order("date", {
+        ascending: true
+      })
+      .order("sort_order", {
+        ascending: true
+      });
 
 
-  try {
-
-    const {
-      data,
-      error
-    } =
-      await supabaseClient
-        .from("events")
-        .select("*")
-        .order(
-          "date",
-          {
-            ascending: true
-          }
-        );
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    events =
-      data || [];
-
-
-    renderCalendar();
-
-  } catch (error) {
+  if (error) {
 
     console.error(error);
 
-
-    showError(
-      "일정을 불러오지 못했습니다: " +
+    alert(
+      "일정을 불러오지 못했습니다.\n\n" +
       error.message
     );
+
+    return;
+
   }
+
+
+  events =
+    data || [];
+
+  /*
+    기존 sort_order가 없는 예전 데이터도
+    날짜별로 자동 정렬 번호를 만들어준다.
+  */
+
+  normalizeLocalOrder();
+
+  render();
+
 }
 
 
 /* =========================================================
-   ★ 캘린더 렌더링
+   기존 데이터 순서 보정
 ========================================================= */
 
-function renderCalendar() {
+function normalizeLocalOrder() {
+
+  const grouped = {};
+
+  events.forEach(event => {
+
+    if (!grouped[event.date]) {
+
+      grouped[event.date] = [];
+
+    }
+
+    grouped[event.date].push(event);
+
+  });
+
+
+  Object.keys(grouped)
+    .forEach(date => {
+
+      grouped[date]
+        .sort((a, b) =>
+          (a.sort_order ?? 0) -
+          (b.sort_order ?? 0)
+        );
+
+      grouped[date]
+        .forEach((event, index) => {
+
+          event.sort_order =
+            index;
+
+        });
+
+    });
+
+}
+
+
+/* =========================================================
+   달력 렌더링
+========================================================= */
+
+function render() {
 
   const year =
     currentDate.getFullYear();
-
 
   const month =
     currentDate.getMonth();
 
 
-  monthTitle.textContent =
-    `${year}년 ${month + 1}월`;
+  document.getElementById(
+    "year"
+  ).textContent =
+    year + "년";
 
 
-  calendarGrid.innerHTML =
-    "";
+  document.getElementById(
+    "month"
+  ).textContent =
+    month + 1;
 
 
-  /*
-    월요일 시작
+  renderWeekdays();
 
-    JS:
-    일 0
-    월 1
-    화 2
-    수 3
-    목 4
-    금 5
-    토 6
 
-    캘린더:
-    월 0
-    화 1
-    수 2
-    목 3
-    금 4
-    토 5
-    일 6
-  */
-
-  const jsFirstDay =
+  const first =
     new Date(
       year,
       month,
       1
-    ).getDay();
+    );
 
-
-  const firstDay =
-    (
-      jsFirstDay + 6
-    ) % 7;
-
-
-  const daysInMonth =
+  const last =
     new Date(
       year,
       month + 1,
       0
-    ).getDate();
+    );
 
 
   /*
-    앞쪽 빈칸
+    월요일 시작
   */
+
+  const start =
+    (first.getDay() + 6) % 7;
+
+
+  const total =
+    Math.ceil(
+      (start + last.getDate()) / 7
+    ) * 7;
+
+
+  let html = "";
+
 
   for (
     let i = 0;
-    i < firstDay;
+    i < total;
     i++
   ) {
 
-    const empty =
-      document.createElement(
-        "div"
-      );
+    const dayNumber =
+      i - start + 1;
 
-
-    empty.className =
-      "empty-cell";
-
-
-    calendarGrid.appendChild(
-      empty
-    );
-  }
-
-
-  const today =
-    new Date();
-
-
-  const todayString =
-    formatDate(
-      today
-    );
-
-
-  /*
-    날짜 생성
-  */
-
-  for (
-    let dayNumber = 1;
-    dayNumber <= daysInMonth;
-    dayNumber++
-  ) {
 
     const date =
       new Date(
@@ -1670,428 +1435,780 @@ function renderCalendar() {
       );
 
 
-    const dateString =
-      formatDate(
-        date
-      );
+    const inMonth =
+      dayNumber >= 1 &&
+      dayNumber <= last.getDate();
 
 
-    const day =
-      document.createElement(
-        "div"
-      );
+    const key =
+      dateKey(date);
 
 
-    day.className =
+    let classes =
       "day";
 
 
-    day.dataset.date =
-      dateString;
+    if (!inMonth) {
 
+      classes +=
+        " muted";
 
-    if (currentUser) {
-
-      day.classList.add(
-        "admin-day"
-      );
     }
 
 
-    /*
-      토요일 / 일요일
-    */
+    if (date.getDay() === 6) {
 
-    const jsDay =
-      date.getDay();
+      classes +=
+        " sat";
+
+    }
+
+
+    if (date.getDay() === 0) {
+
+      classes +=
+        " sun";
+
+    }
+
+
+    const today =
+      new Date();
 
 
     if (
-      jsDay === 6
+      date.toDateString() ===
+      today.toDateString()
     ) {
 
-      day.classList.add(
-        "saturday"
-      );
+      classes +=
+        " today";
+
     }
 
-
-    if (
-      jsDay === 0
-    ) {
-
-      day.classList.add(
-        "sunday"
-      );
-    }
-
-
-    /*
-      오늘
-    */
-
-    if (
-      dateString ===
-      todayString
-    ) {
-
-      day.classList.add(
-        "today"
-      );
-    }
-
-
-    /*
-      날짜 숫자
-    */
-
-    const number =
-      document.createElement(
-        "div"
-      );
-
-
-    number.className =
-      "day-number";
-
-
-    number.textContent =
-      dayNumber;
-
-
-    day.appendChild(
-      number
-    );
-
-
-    /* =====================================================
-       ★★★ 여기서 일정 개수를 판단
-    ===================================================== */
 
     const dayEvents =
-      getEventsForDate(
-        dateString
-      );
-
-
-    const eventCount =
-      dayEvents.length;
-
-
-    /*
-      ======================================================
-      규칙
-
-      ① 일정이 정확히 1개
-         + 색상 있음
-         → 날짜 칸 전체 색칠
-
-      ② 일정이 2개 이상
-         → 전부 글자 부분만 색칠
-
-      ③ 일정이 1개
-         + 색상 없음
-         → 글자 부분만 표시
-      ======================================================
-    */
-
-
-    if (
-      eventCount === 1
-    ) {
-
-      const onlyEvent =
-        dayEvents[0];
-
-
-      const color =
-        String(
-          onlyEvent.color || ""
-        ).toLowerCase();
-
-
-      /*
-        ★ 일정 1개이고
-        색상이 있을 때만
-        날짜 칸 전체를 칠한다.
-      */
-
-      if (
-        [
-          "gray",
-          "green",
-          "yellow",
-          "purple"
-        ].includes(
-          color
+      events
+        .filter(event =>
+          event.date === key
         )
-      ) {
-
-        day.classList.add(
-          `single-colored-${color}`
+        .sort(
+          (a, b) =>
+            (a.sort_order ?? 0) -
+            (b.sort_order ?? 0)
         );
+
+
+    html += `
+
+      <div
+        class="${classes}"
+        data-date="${key}"
+        onclick="dayClick(event, '${key}')"
+      >
+
+        <div class="date">
+          ${date.getDate()}
+        </div>
+
+        <div class="events">
+
+    `;
+
+
+    dayEvents.forEach(event => {
+
+      html += `
+
+        <div
+          class="event ${escapeHtml(event.color || "gray")}"
+          draggable="${currentUser ? "true" : "false"}"
+          data-event-id="${event.id}"
+          onclick="eventClick(event, '${event.id}')"
+        >
+          ${formatText(event.title || event.text || "")}
+        </div>
+
+      `;
+
+    });
+
+
+    html += `
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  document.getElementById(
+    "grid"
+  ).innerHTML =
+    html;
+
+
+  setupDragAndDrop();
+
+  renderSide();
+
+}
+
+
+/* =========================================================
+   요일
+========================================================= */
+
+function renderWeekdays() {
+
+  const names = [
+    "월",
+    "화",
+    "수",
+    "목",
+    "금",
+    "토",
+    "일"
+  ];
+
+
+  document.getElementById(
+    "weekdays"
+  ).innerHTML = names
+    .map(
+      (name, index) => {
+
+        let cls =
+          "weekday";
+
+        if (index === 5) {
+
+          cls += " sat";
+
+        }
+
+        if (index === 6) {
+
+          cls += " sun";
+
+        }
+
+        return `
+          <div class="${cls}">
+            ${name}
+          </div>
+        `;
+
       }
-    }
+    )
+    .join("");
+
+}
 
 
-    /*
-      ======================================================
-      일정 표시
-    ======================================================
-    */
+/* =========================================================
+   날짜 클릭
+========================================================= */
 
-    const eventsContainer =
-      document.createElement(
-        "div"
-      );
+function dayClick(
+  event,
+  date
+) {
 
+  /*
+    일정 자체를 클릭했을 경우
+    여기서 처리하지 않는다.
+  */
 
-    eventsContainer.className =
-      "events";
+  if (
+    event.target.closest(".event")
+  ) {
 
+    return;
 
-    dayEvents.forEach(
-      event => {
-
-        const eventElement =
-          document.createElement(
-            "div"
-          );
+  }
 
 
-        eventElement.className =
-          "event";
+  if (!currentUser) {
+
+    return;
+
+  }
 
 
-        const color =
-          String(
-            event.color || ""
-          ).toLowerCase();
+  openAddModal(date);
+
+}
 
 
-        /*
-          ==================================================
-          ★ 일정 1개 + 색상 있음
+/* =========================================================
+   일정 클릭
+========================================================= */
 
-          날짜 전체가 이미 색칠됨.
+function eventClick(
+  event,
+  id
+) {
 
-          따라서 글자 부분에는
-          별도의 색상 배경을 주지 않는다.
-          ==================================================
-        */
-
-        if (
-          eventCount === 1 &&
-          color &&
-          [
-            "gray",
-            "green",
-            "yellow",
-            "purple"
-          ].includes(
-            color
-          )
-        ) {
-
-          eventElement.classList.add(
-            "full-color-text"
-          );
-
-        }
-
-        /*
-          ==================================================
-          ★ 일정 2개 이상 + 색상 있음
-
-          날짜 전체는 칠하지 않고
-          일정 글자 부분만 색칠.
-          ==================================================
-        */
-
-        else if (
-          eventCount >= 2 &&
-          color &&
-          [
-            "gray",
-            "green",
-            "yellow",
-            "purple"
-          ].includes(
-            color
-          )
-        ) {
-
-          eventElement.classList.add(
-            `multi-${color}`
-          );
-        }
-
-        /*
-          ==================================================
-          색상 없음
-
-          항상 글자 부분 표시
-          ==================================================
-        */
-
-        else {
-
-          eventElement.classList.add(
-            "no-color"
-          );
-        }
+  event.stopPropagation();
 
 
-        eventElement.textContent =
-          event.title;
-
-
-        /*
-          일정 위에서 드래그 시작 방지
-        */
-
-        eventElement.addEventListener(
-          "pointerdown",
-          eventObject => {
-
-            eventObject.stopPropagation();
-          }
-        );
-
-
-        /*
-          일정 클릭 → 수정
-        */
-
-        eventElement.addEventListener(
-          "click",
-          eventObject => {
-
-            eventObject.stopPropagation();
-
-
-            if (!currentUser) {
-              return;
-            }
-
-
-            openEditModal(
-              event
-            );
-          }
-        );
-
-
-        eventsContainer.appendChild(
-          eventElement
-        );
-      }
+  const item =
+    events.find(
+      x => String(x.id) === String(id)
     );
 
 
-    day.appendChild(
-      eventsContainer
-    );
+  if (!item) {
+
+    return;
+
+  }
 
 
-    /*
-      ======================================================
-      날짜 클릭
-      ======================================================
-    */
+  if (!currentUser) {
 
-    day.addEventListener(
-      "click",
-      () => {
+    return;
 
-        if (
-          suppressNextClick
-        ) {
-
-          suppressNextClick =
-            false;
-
-          return;
-        }
-
-
-        if (!currentUser) {
-          return;
-        }
-
-
-        const dayEventsNow =
-          getEventsForDate(
-            dateString
-          );
-
-
-        if (
-          dayEventsNow.length > 0
-        ) {
-
-          /*
-            여러 개면 첫 번째 일정 수정.
-          */
-
-          openEditModal(
-            dayEventsNow[0]
-          );
-
-        } else {
-
-          openAddModal(
-            dateString
-          );
-        }
-      }
-    );
-
-
-    calendarGrid.appendChild(
-      day
-    );
   }
 
 
   /*
-    뒤쪽 빈칸
+    일정 클릭:
+    수정할지 삭제할지 선택
   */
 
-  const totalCells =
-    firstDay +
-    daysInMonth;
+  const action =
+    confirm(
+      `"${(item.title || item.text || "")
+        .replaceAll("\n", " ")}"\n\n` +
+      "확인 = 수정\n취소 = 삭제"
+    );
 
 
-  const remaining =
-    (
-      7 -
-      (
-        totalCells % 7
+  if (action) {
+
+    openEditModal(item);
+
+  } else {
+
+    if (
+      confirm(
+        "정말 삭제할까요?"
       )
-    ) % 7;
+    ) {
+
+      deleteEvent(item.id);
+
+    }
+
+  }
+
+}
 
 
-  for (
-    let i = 0;
-    i < remaining;
-    i++
+/* =========================================================
+   드래그 앤 드롭
+========================================================= */
+
+function setupDragAndDrop() {
+
+  const eventElements =
+    document.querySelectorAll(
+      ".event"
+    );
+
+
+  eventElements.forEach(el => {
+
+    if (!currentUser) {
+
+      return;
+
+    }
+
+
+    /* -------------------------
+       드래그 시작
+    ------------------------- */
+
+    el.addEventListener(
+      "dragstart",
+      dragStart
+    );
+
+
+    /* -------------------------
+       드래그 종료
+    ------------------------- */
+
+    el.addEventListener(
+      "dragend",
+      dragEnd
+    );
+
+
+    /* -------------------------
+       다른 일정 위로 이동
+    ------------------------- */
+
+    el.addEventListener(
+      "dragover",
+      dragOver
+    );
+
+
+    /* -------------------------
+       드래그해서 들어왔을 때
+    ------------------------- */
+
+    el.addEventListener(
+      "dragenter",
+      dragEnter
+    );
+
+
+    /* -------------------------
+       드래그가 빠졌을 때
+    ------------------------- */
+
+    el.addEventListener(
+      "dragleave",
+      dragLeave
+    );
+
+
+    /* -------------------------
+       놓기
+    ------------------------- */
+
+    el.addEventListener(
+      "drop",
+      dropEvent
+    );
+
+  });
+
+}
+
+
+/* =========================================================
+   drag start
+========================================================= */
+
+function dragStart(event) {
+
+  if (!currentUser) {
+
+    event.preventDefault();
+
+    return;
+
+  }
+
+
+  const id =
+    event.currentTarget
+      .dataset
+      .eventId;
+
+
+  draggedEventId =
+    id;
+
+
+  event.currentTarget
+    .classList
+    .add("dragging");
+
+
+  event.dataTransfer.effectAllowed =
+    "move";
+
+
+  event.dataTransfer.setData(
+    "text/plain",
+    id
+  );
+
+}
+
+
+/* =========================================================
+   drag end
+========================================================= */
+
+function dragEnd(event) {
+
+  event.currentTarget
+    .classList
+    .remove(
+      "dragging"
+    );
+
+
+  document
+    .querySelectorAll(
+      ".event.drag-over"
+    )
+    .forEach(el =>
+      el.classList.remove(
+        "drag-over"
+      )
+    );
+
+
+  draggedEventId =
+    null;
+
+}
+
+
+/* =========================================================
+   drag over
+========================================================= */
+
+function dragOver(event) {
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
+
+  event.preventDefault();
+
+  event.dataTransfer.dropEffect =
+    "move";
+
+}
+
+
+/* =========================================================
+   drag enter
+========================================================= */
+
+function dragEnter(event) {
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
+
+  const target =
+    event.currentTarget;
+
+
+  const targetId =
+    target.dataset.eventId;
+
+
+  if (
+    String(targetId) ===
+    String(draggedEventId)
   ) {
 
-    const empty =
-      document.createElement(
-        "div"
+    return;
+
+  }
+
+
+  const dragged =
+    events.find(
+      x =>
+        String(x.id) ===
+        String(draggedEventId)
+    );
+
+
+  const targetEvent =
+    events.find(
+      x =>
+        String(x.id) ===
+        String(targetId)
+    );
+
+
+  if (
+    !dragged ||
+    !targetEvent
+  ) {
+
+    return;
+
+  }
+
+
+  /*
+    다른 날짜로 옮기는 건 막는다.
+
+    지금 기능은
+    "같은 날짜 안에서 위아래 순서 변경"
+    전용이다.
+  */
+
+  if (
+    dragged.date !==
+    targetEvent.date
+  ) {
+
+    return;
+
+  }
+
+
+  target.classList.add(
+    "drag-over"
+  );
+
+}
+
+
+/* =========================================================
+   drag leave
+========================================================= */
+
+function dragLeave(event) {
+
+  event.currentTarget
+    .classList.remove(
+      "drag-over"
+    );
+
+}
+
+
+/* =========================================================
+   drop
+========================================================= */
+
+async function dropEvent(event) {
+
+  event.preventDefault();
+
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
+
+  const target =
+    event.currentTarget;
+
+
+  target.classList.remove(
+    "drag-over"
+  );
+
+
+  const draggedId =
+    event.dataTransfer.getData(
+      "text/plain"
+    ) ||
+    draggedEventId;
+
+
+  const targetId =
+    target.dataset.eventId;
+
+
+  if (
+    !draggedId ||
+    !targetId ||
+    String(draggedId) ===
+    String(targetId)
+  ) {
+
+    return;
+
+  }
+
+
+  const dragged =
+    events.find(
+      x =>
+        String(x.id) ===
+        String(draggedId)
+    );
+
+
+  const targetEvent =
+    events.find(
+      x =>
+        String(x.id) ===
+        String(targetId)
+    );
+
+
+  if (
+    !dragged ||
+    !targetEvent
+  ) {
+
+    return;
+
+  }
+
+
+  /*
+    같은 날짜에서만 순서 변경
+  */
+
+  if (
+    dragged.date !==
+    targetEvent.date
+  ) {
+
+    alert(
+      "일정 순서는 같은 날짜 안에서만 바꿀 수 있어요."
+    );
+
+    return;
+
+  }
+
+
+  const date =
+    dragged.date;
+
+
+  /*
+    해당 날짜 일정만 가져온다.
+  */
+
+  let sameDay =
+    events
+      .filter(
+        x => x.date === date
+      )
+      .sort(
+        (a, b) =>
+          (a.sort_order ?? 0) -
+          (b.sort_order ?? 0)
       );
 
 
-    empty.className =
-      "empty-cell";
-
-
-    calendarGrid.appendChild(
-      empty
+  const fromIndex =
+    sameDay.findIndex(
+      x =>
+        String(x.id) ===
+        String(draggedId)
     );
+
+
+  const toIndex =
+    sameDay.findIndex(
+      x =>
+        String(x.id) ===
+        String(targetId)
+    );
+
+
+  if (
+    fromIndex === -1 ||
+    toIndex === -1
+  ) {
+
+    return;
+
   }
+
+
+  /*
+    배열에서 실제 순서를 바꾼다.
+  */
+
+  const [
+    moved
+  ] =
+    sameDay.splice(
+      fromIndex,
+      1
+    );
+
+
+  sameDay.splice(
+    toIndex,
+    0,
+    moved
+  );
+
+
+  /*
+    화면에서 먼저 순서를 바꿔준다.
+  */
+
+  sameDay.forEach(
+    (event, index) => {
+
+      event.sort_order =
+        index;
+
+    }
+  );
+
+
+  render();
+
+
+  /*
+    Supabase에 저장
+  */
+
+  try {
+
+    for (
+      const event of sameDay
+    ) {
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("events")
+          .update({
+            sort_order:
+              event.sort_order
+          })
+          .eq(
+            "id",
+            event.id
+          );
+
+
+      if (error) {
+
+        throw error;
+
+      }
+
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "일정 순서를 저장하지 못했습니다.\n\n" +
+      error.message
+    );
+
+    /*
+      실패하면 서버에서 다시 불러온다.
+    */
+
+    await loadEvents();
+
+  }
+
 }
 
 
@@ -2099,842 +2216,160 @@ function renderCalendar() {
    월 이동
 ========================================================= */
 
-function changeMonth(
-  amount
-) {
+function moveMonth(amount) {
 
   currentDate =
     new Date(
       currentDate.getFullYear(),
-      currentDate.getMonth() +
-        amount,
+      currentDate.getMonth() + amount,
       1
     );
 
+  render();
 
-  clearDragSelection();
-
-
-  /*
-    현재 events 배열에 있는
-    DB 일정들을 기준으로
-    새 달을 다시 렌더링한다.
-  */
-
-  renderCalendar();
 }
 
+
+/* =========================================================
+   오늘
+========================================================= */
 
 function goToday() {
 
-  const today =
+  const now =
     new Date();
-
 
   currentDate =
     new Date(
-      today.getFullYear(),
-      today.getMonth(),
+      now.getFullYear(),
+      now.getMonth(),
       1
     );
 
+  selectedDate =
+    now;
 
-  clearDragSelection();
+  render();
 
-
-  renderCalendar();
 }
 
 
 /* =========================================================
-   날짜 범위
-========================================================= */
-
-function getDateRange(
-  startString,
-  endString
-) {
-
-  let start =
-    parseLocalDate(
-      startString
-    );
-
-
-  let end =
-    parseLocalDate(
-      endString
-    );
-
-
-  if (
-    start > end
-  ) {
-
-    const temp =
-      start;
-
-
-    start =
-      end;
-
-
-    end =
-      temp;
-  }
-
-
-  const result =
-    [];
-
-
-  const cursor =
-    new Date(start);
-
-
-  while (
-    cursor <= end
-  ) {
-
-    result.push(
-      formatDate(
-        cursor
-      )
-    );
-
-
-    cursor.setDate(
-      cursor.getDate() + 1
-    );
-  }
-
-
-  return result;
-}
-
-
-/* =========================================================
-   드래그
-========================================================= */
-
-function updateDragSelection() {
-
-  if (
-    !dragStartDate ||
-    !dragCurrentDate
-  ) {
-
-    return;
-  }
-
-
-  selectedDates =
-    getDateRange(
-      dragStartDate,
-      dragCurrentDate
-    );
-
-
-  document
-    .querySelectorAll(
-      ".day[data-date]"
-    )
-    .forEach(
-      day => {
-
-        const date =
-          day.dataset.date;
-
-
-        day.classList.toggle(
-          "drag-selected",
-          selectedDates.includes(
-            date
-          )
-        );
-
-
-        day.classList.toggle(
-          "drag-anchor",
-          date ===
-          dragStartDate
-        );
-      }
-    );
-}
-
-
-function clearDragSelection() {
-
-  document
-    .querySelectorAll(
-      ".day.drag-selected, .day.drag-anchor"
-    )
-    .forEach(
-      day => {
-
-        day.classList.remove(
-          "drag-selected",
-          "drag-anchor"
-        );
-      }
-    );
-
-
-  selectedDates =
-    [];
-
-
-  dragStartDate =
-    null;
-
-
-  dragCurrentDate =
-    null;
-}
-
-
-function startDrag(
-  dateString
-) {
-
-  if (!currentUser) {
-    return;
-  }
-
-
-  isDragging =
-    true;
-
-
-  dragStartDate =
-    dateString;
-
-
-  dragCurrentDate =
-    dateString;
-
-
-  selectedDates =
-    [
-      dateString
-    ];
-
-
-  calendarGrid.classList.add(
-    "dragging"
-  );
-
-
-  updateDragSelection();
-}
-
-
-function updateDragFromPointer(
-  clientX,
-  clientY
-) {
-
-  if (!isDragging) {
-    return;
-  }
-
-
-  const element =
-    document.elementFromPoint(
-      clientX,
-      clientY
-    );
-
-
-  if (!element) {
-    return;
-  }
-
-
-  const day =
-    element.closest(
-      ".day[data-date]"
-    );
-
-
-  if (!day) {
-    return;
-  }
-
-
-  const dateString =
-    day.dataset.date;
-
-
-  if (
-    dateString !==
-    dragCurrentDate
-  ) {
-
-    dragCurrentDate =
-      dateString;
-
-
-    updateDragSelection();
-  }
-}
-
-
-function finishDrag() {
-
-  if (!isDragging) {
-    return;
-  }
-
-
-  isDragging =
-    false;
-
-
-  calendarGrid.classList.remove(
-    "dragging"
-  );
-
-
-  const dates =
-    [
-      ...selectedDates
-    ];
-
-
-  suppressNextClick =
-    true;
-
-
-  setTimeout(
-    () => {
-
-      suppressNextClick =
-        false;
-
-    },
-    300
-  );
-
-
-  if (
-    dates.length === 0
-  ) {
-
-    clearDragSelection();
-
-    return;
-  }
-
-
-  /*
-    한 날짜
-  */
-
-  if (
-    dates.length === 1
-  ) {
-
-    const date =
-      dates[0];
-
-
-    clearDragSelection();
-
-
-    openAddModal(
-      date
-    );
-
-
-    return;
-  }
-
-
-  /*
-    여러 날짜
-  */
-
-  selectedDates =
-    dates;
-
-
-  openMultiAddModal(
-    dates
-  );
-}
-
-
-/* =========================================================
-   드래그 시작
-========================================================= */
-
-calendarGrid.addEventListener(
-  "pointerdown",
-  event => {
-
-    if (!currentUser) {
-      return;
-    }
-
-
-    /*
-      일정 자체를 누르면
-      수정으로 처리.
-    */
-
-    if (
-      event.target.closest(
-        ".event"
-      )
-    ) {
-
-      return;
-    }
-
-
-    const day =
-      event.target.closest(
-        ".day[data-date]"
-      );
-
-
-    if (!day) {
-      return;
-    }
-
-
-    event.preventDefault();
-
-
-    startDrag(
-      day.dataset.date
-    );
-  }
-);
-
-
-/* =========================================================
-   드래그 이동
-========================================================= */
-
-document.addEventListener(
-  "pointermove",
-  event => {
-
-    if (!isDragging) {
-      return;
-    }
-
-
-    event.preventDefault();
-
-
-    updateDragFromPointer(
-      event.clientX,
-      event.clientY
-    );
-  },
-  {
-    passive: false
-  }
-);
-
-
-/* =========================================================
-   드래그 종료
-========================================================= */
-
-document.addEventListener(
-  "pointerup",
-  () => {
-
-    if (isDragging) {
-
-      finishDrag();
-    }
-  }
-);
-
-
-/* =========================================================
-   일정 추가
+   일정 추가 모달
 ========================================================= */
 
 function openAddModal(
-  dateString
+  date = null
 ) {
 
   if (!currentUser) {
+
+    openLoginModal();
+
     return;
+
   }
 
 
-  editingEventId =
+  editingId =
     null;
 
 
-  selectedDates =
-    [
-      dateString
-    ];
-
-
-  document
-    .getElementById(
-      "eventModalTitle"
-    )
-    .textContent =
+  document.getElementById(
+    "eventModalTitle"
+  ).textContent =
     "일정 추가";
 
 
-  document
-    .getElementById(
-      "dateInput"
-    )
-    .value =
-    dateString;
+  const selected =
+    date ||
+    dateKey(selectedDate);
 
 
-  document
-    .getElementById(
-      "singleDateGroup"
-    )
-    .style.display =
-    "block";
+  document.getElementById(
+    "eventDate"
+  ).value =
+    selected;
 
 
-  document
-    .getElementById(
-      "rangeDateGroup"
-    )
-    .style.display =
-    "none";
-
-
-  document
-    .getElementById(
-      "titleInput"
-    )
-    .value =
+  document.getElementById(
+    "eventText"
+  ).value =
     "";
 
 
-  document
-    .getElementById(
-      "colorInput"
-    )
-    .value =
-    "";
+  document.getElementById(
+    "eventColor"
+  ).value =
+    "gray";
 
 
-  document
-    .getElementById(
-      "deleteButton"
-    )
-    .style.display =
-    "none";
+  document.getElementById(
+    "eventModal"
+  ).style.display =
+    "flex";
 
-
-  document
-    .getElementById(
-      "eventModalBg"
-    )
-    .classList.add(
-      "show"
-    );
-
-
-  setTimeout(
-    () => {
-
-      document
-        .getElementById(
-          "titleInput"
-        )
-        .focus();
-
-    },
-    100
-  );
 }
 
 
 /* =========================================================
-   여러 날짜 추가
-========================================================= */
-
-function openMultiAddModal(
-  dates
-) {
-
-  if (!currentUser) {
-    return;
-  }
-
-
-  editingEventId =
-    null;
-
-
-  selectedDates =
-    [
-      ...dates
-    ];
-
-
-  document
-    .getElementById(
-      "eventModalTitle"
-    )
-    .textContent =
-    "여러 날짜 일정 추가";
-
-
-  document
-    .getElementById(
-      "singleDateGroup"
-    )
-    .style.display =
-    "none";
-
-
-  document
-    .getElementById(
-      "rangeDateGroup"
-    )
-    .style.display =
-    "block";
-
-
-  const first =
-    dates[0];
-
-
-  const last =
-    dates[
-      dates.length - 1
-    ];
-
-
-  const dateText =
-    first === last
-      ? first
-      : `${first} ~ ${last}`;
-
-
-  document
-    .getElementById(
-      "rangeInfo"
-    )
-    .innerHTML =
-    `<strong>${dateText}</strong><br>` +
-    `${dates.length}일에 같은 일정이 등록됩니다.`;
-
-
-  document
-    .getElementById(
-      "titleInput"
-    )
-    .value =
-    "";
-
-
-  document
-    .getElementById(
-      "colorInput"
-    )
-    .value =
-    "";
-
-
-  document
-    .getElementById(
-      "deleteButton"
-    )
-    .style.display =
-    "none";
-
-
-  document
-    .getElementById(
-      "eventModalBg"
-    )
-    .classList.add(
-      "show"
-    );
-
-
-  setTimeout(
-    () => {
-
-      document
-        .getElementById(
-          "titleInput"
-        )
-        .focus();
-
-    },
-    100
-  );
-}
-
-
-/* =========================================================
-   일정 수정
+   일정 수정 모달
 ========================================================= */
 
 function openEditModal(
-  event
+  item
 ) {
 
-  if (!currentUser) {
-    return;
-  }
+  editingId =
+    item.id;
 
 
-  editingEventId =
-    event.id;
-
-
-  selectedDates =
-    [
-      event.date
-    ];
-
-
-  document
-    .getElementById(
-      "eventModalTitle"
-    )
-    .textContent =
+  document.getElementById(
+    "eventModalTitle"
+  ).textContent =
     "일정 수정";
 
 
-  document
-    .getElementById(
-      "singleDateGroup"
-    )
-    .style.display =
-    "block";
+  document.getElementById(
+    "eventDate"
+  ).value =
+    item.date;
 
 
-  document
-    .getElementById(
-      "rangeDateGroup"
-    )
-    .style.display =
-    "none";
+  document.getElementById(
+    "eventText"
+  ).value =
+    item.title ||
+    item.text ||
+    "";
 
 
-  document
-    .getElementById(
-      "dateInput"
-    )
-    .value =
-    event.date;
+  document.getElementById(
+    "eventColor"
+  ).value =
+    item.color ||
+    "gray";
 
 
-  document
-    .getElementById(
-      "titleInput"
-    )
-    .value =
-    event.title;
+  document.getElementById(
+    "eventModal"
+  ).style.display =
+    "flex";
 
-
-  document
-    .getElementById(
-      "colorInput"
-    )
-    .value =
-    event.color || "";
-
-
-  document
-    .getElementById(
-      "deleteButton"
-    ).style.display =
-    "block";
-
-
-  document
-    .getElementById(
-      "eventModalBg"
-    )
-    .classList.add(
-      "show"
-    );
-
-
-  setTimeout(
-    () => {
-
-      document
-        .getElementById(
-          "titleInput"
-        )
-        .focus();
-
-    },
-    100
-  );
 }
 
 
 /* =========================================================
-   모달 닫기
+   일정 모달 닫기
 ========================================================= */
 
 function closeEventModal() {
 
-  document
-    .getElementById(
-      "eventModalBg"
-    )
-    .classList.remove(
-      "show"
-    );
+  document.getElementById(
+    "eventModal"
+  ).style.display =
+    "none";
 
-
-  editingEventId =
-    null;
-
-
-  selectedDates =
-    [];
-
-
-  clearDragSelection();
-}
-
-
-function closeModalByBackground(
-  event
-) {
-
-  if (
-    event.target.id ===
-    "eventModalBg"
-  ) {
-
-    closeEventModal();
-  }
-}
-
-
-function closeLoginByBackground(
-  event
-) {
-
-  if (
-    event.target.id ===
-    "loginModalBg"
-  ) {
-
-    closeLoginModal();
-  }
 }
 
 
@@ -2947,268 +2382,182 @@ async function saveEvent() {
   if (!currentUser) {
 
     alert(
-      "일정을 추가하려면 먼저 로그인해주세요."
+      "관리자 로그인 후 이용해주세요."
     );
 
     return;
+
   }
 
 
-  clearError();
+  const date =
+    document.getElementById(
+      "eventDate"
+    ).value;
 
 
   const title =
-    document
-      .getElementById(
-        "titleInput"
-      )
-      .value
-      .trim();
+    document.getElementById(
+      "eventText"
+    ).value.trim();
 
 
   const color =
-    document
-      .getElementById(
-        "colorInput"
-      )
-      .value;
+    document.getElementById(
+      "eventColor"
+    ).value;
 
 
-  if (!title) {
+  if (!date || !title) {
 
     alert(
-      "일정 내용을 입력해주세요."
+      "날짜와 일정 내용을 입력해주세요."
     );
 
-
-    document
-      .getElementById(
-        "titleInput"
-      )
-      .focus();
-
-
     return;
+
   }
 
 
-  /* =====================================================
-     수정
-  ===================================================== */
+  try {
 
-  if (editingEventId) {
+    /*
+      -------------------------
+      수정
+      -------------------------
+    */
 
-    const date =
-      document
-        .getElementById(
-          "dateInput"
-        )
-        .value;
-
-
-    if (!date) {
-
-      alert(
-        "날짜를 선택해주세요."
-      );
-
-      return;
-    }
-
-
-    try {
+    if (editingId) {
 
       const {
-        data,
         error
       } =
         await supabaseClient
           .from("events")
           .update({
-
-            date:
-              date,
-
-            title:
-              title,
-
-            color:
-              color
-
+            date: date,
+            title: title,
+            text: title,
+            color: color
           })
           .eq(
             "id",
-            editingEventId
-          )
-          .select();
+            editingId
+          );
 
 
       if (error) {
+
         throw error;
+
       }
 
+    }
 
-      const index =
-        events.findIndex(
-          event =>
-            event.id ===
-            editingEventId
-        );
+    /*
+      -------------------------
+      새 일정
+      -------------------------
+    */
+
+    else {
+
+      /*
+        해당 날짜의 마지막 순서를 찾는다.
+      */
+
+      const sameDay =
+        events
+          .filter(
+            x =>
+              x.date === date
+          );
 
 
-      if (
-        index !== -1 &&
-        data &&
-        data.length > 0
-      ) {
+      const maxOrder =
+        sameDay.length
+          ? Math.max(
+              ...sameDay.map(
+                x =>
+                  Number(
+                    x.sort_order ?? 0
+                  )
+              )
+            )
+          : -1;
 
-        events[index] =
-          data[0];
+
+      const newEvent = {
+
+        date: date,
+
+        title: title,
+
+        text: title,
+
+        color: color,
+
+        sort_order:
+          maxOrder + 1
+
+      };
+
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("events")
+          .insert(
+            newEvent
+          );
+
+
+      if (error) {
+
+        throw error;
+
       }
 
-
-      closeEventModal();
-
-
-      renderCalendar();
-
-
-      return;
-
-    } catch (error) {
-
-      console.error(error);
-
-
-      alert(
-        "일정 수정에 실패했습니다.\n" +
-        error.message
-      );
-
-
-      return;
-    }
-  }
-
-
-  /* =====================================================
-     새 일정
-  ===================================================== */
-
-  let datesToSave =
-    [
-      ...selectedDates
-    ];
-
-
-  if (
-    datesToSave.length === 0
-  ) {
-
-    const date =
-      document
-        .getElementById(
-          "dateInput"
-        )
-        .value;
-
-
-    if (!date) {
-
-      alert(
-        "날짜를 선택해주세요."
-      );
-
-
-      return;
-    }
-
-
-    datesToSave =
-      [
-        date
-      ];
-  }
-
-
-  /*
-    중복 날짜 제거
-  */
-
-  datesToSave =
-    [
-      ...new Set(
-        datesToSave
-      )
-    ];
-
-
-  /*
-    여러 날짜에 동일 일정 저장
-  */
-
-  const rows =
-    datesToSave.map(
-      date => ({
-
-        id:
-          crypto.randomUUID(),
-
-        date:
-          date,
-
-        title:
-          title,
-
-        color:
-          color
-
-      })
-    );
-
-
-  try {
-
-    const {
-      data,
-      error
-    } =
-      await supabaseClient
-        .from("events")
-        .insert(
-          rows
-        )
-        .select();
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    if (data) {
-
-      events.push(
-        ...data
-      );
     }
 
 
     closeEventModal();
 
+    await loadEvents();
 
-    renderCalendar();
+
+    const d =
+      new Date(
+        date + "T12:00:00"
+      );
+
+
+    selectedDate =
+      d;
+
+
+    currentDate =
+      new Date(
+        d.getFullYear(),
+        d.getMonth(),
+        1
+      );
+
+
+    render();
 
   } catch (error) {
 
     console.error(error);
 
-
     alert(
-      "일정 저장에 실패했습니다.\n" +
+      "일정을 저장하지 못했습니다.\n\n" +
       error.message
     );
+
   }
+
 }
 
 
@@ -3216,39 +2565,14 @@ async function saveEvent() {
    일정 삭제
 ========================================================= */
 
-async function deleteEvent() {
+async function deleteEvent(
+  id
+) {
 
   if (!currentUser) {
+
     return;
-  }
 
-
-  if (!editingEventId) {
-    return;
-  }
-
-
-  const event =
-    events.find(
-      item =>
-        item.id ===
-        editingEventId
-    );
-
-
-  if (!event) {
-    return;
-  }
-
-
-  const confirmed =
-    confirm(
-      `"${event.title}" 일정을 삭제할까요?`
-    );
-
-
-  if (!confirmed) {
-    return;
   }
 
 
@@ -3262,172 +2586,280 @@ async function deleteEvent() {
         .delete()
         .eq(
           "id",
-          editingEventId
+          id
         );
 
 
     if (error) {
+
       throw error;
+
     }
 
 
-    events =
-      events.filter(
-        item =>
-          item.id !==
-          editingEventId
-      );
-
-
-    closeEventModal();
-
-
-    renderCalendar();
+    await loadEvents();
 
   } catch (error) {
 
     console.error(error);
 
-
     alert(
-      "일정 삭제에 실패했습니다.\n" +
+      "일정을 삭제하지 못했습니다.\n\n" +
       error.message
     );
+
   }
+
 }
 
 
 /* =========================================================
-   키보드
+   사이드 일정
 ========================================================= */
 
-document.addEventListener(
+function renderSide() {
+
+  document.getElementById(
+    "selectedDate"
+  ).textContent =
+    `${String(
+      selectedDate.getMonth() + 1
+    ).padStart(2, "0")}.${String(
+      selectedDate.getDate()
+    ).padStart(2, "0")}`;
+
+
+  document.getElementById(
+    "selectedLabel"
+  ).textContent =
+    selectedDate.toLocaleDateString(
+      "ko-KR",
+      {
+        weekday: "long"
+      }
+    );
+
+
+  const monthKey =
+    `${currentDate.getFullYear()}-${String(
+      currentDate.getMonth() + 1
+    ).padStart(2, "0")}`;
+
+
+  const list =
+    events
+      .filter(
+        event =>
+          event.date.startsWith(
+            monthKey
+          )
+      )
+      .sort(
+        (a, b) => {
+
+          if (
+            a.date !== b.date
+          ) {
+
+            return a.date.localeCompare(
+              b.date
+            );
+
+          }
+
+          return (
+            (a.sort_order ?? 0) -
+            (b.sort_order ?? 0)
+          );
+
+        }
+      );
+
+
+  if (!list.length) {
+
+    document.getElementById(
+      "upcoming"
+    ).innerHTML =
+      `
+        <div class="muted">
+          등록된 일정이 없어요.
+        </div>
+      `;
+
+    return;
+
+  }
+
+
+  document.getElementById(
+    "upcoming"
+  ).innerHTML =
+    list
+      .map(
+        event => `
+
+          <div class="eventrow">
+
+            <i
+              class="dot ${escapeHtml(
+                event.color || "gray"
+              )}"
+            ></i>
+
+            <div>
+
+              <strong>
+                ${formatText(
+                  event.title ||
+                  event.text ||
+                  ""
+                )}
+              </strong>
+
+              <span>
+                ${event.date
+                  .slice(5)
+                  .replace("-", ".")}
+              </span>
+
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+}
+
+
+/* =========================================================
+   로그인 모달
+========================================================= */
+
+function openLoginModal() {
+
+  document.getElementById(
+    "loginModal"
+  ).style.display =
+    "flex";
+
+
+  setTimeout(
+    () => {
+
+      document.getElementById(
+        "emailInput"
+      ).focus();
+
+    },
+    50
+  );
+
+}
+
+
+function closeLoginModal() {
+
+  document.getElementById(
+    "loginModal"
+  ).style.display =
+    "none";
+
+}
+
+
+/* =========================================================
+   모달 바깥 클릭
+========================================================= */
+
+document.getElementById(
+  "eventModal"
+).addEventListener(
+  "click",
+  event => {
+
+    if (
+      event.target.id ===
+      "eventModal"
+    ) {
+
+      closeEventModal();
+
+    }
+
+  }
+);
+
+
+document.getElementById(
+  "loginModal"
+).addEventListener(
+  "click",
+  event => {
+
+    if (
+      event.target.id ===
+      "loginModal"
+    ) {
+
+      closeLoginModal();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   Enter로 로그인
+========================================================= */
+
+document.getElementById(
+  "passwordInput"
+).addEventListener(
   "keydown",
   event => {
 
-    /*
-      일정 저장 Enter
-    */
-
-    if (
-      event.key === "Enter" &&
-      document
-        .getElementById(
-          "eventModalBg"
-        )
-        .classList.contains(
-          "show"
-        )
-    ) {
-
-      const active =
-        document.activeElement;
-
-
-      if (
-        active.id ===
-        "titleInput"
-      ) {
-
-        event.preventDefault();
-
-
-        saveEvent();
-      }
-    }
-
-
-    /*
-      로그인 Enter
-    */
-
-    if (
-      event.key === "Enter" &&
-      document
-        .getElementById(
-          "loginModalBg"
-        )
-        .classList.contains(
-          "show"
-        )
-    ) {
-
-      const active =
-        document.activeElement;
-
-
-      if (
-        active.id === "emailInput" ||
-        active.id === "passwordInput"
-      ) {
-
-        event.preventDefault();
-
-
-        login();
-      }
-    }
-
-
-    /*
-      ESC
-    */
-
     if (
       event.key ===
-      "Escape"
+      "Enter"
     ) {
 
-      if (
-        document
-          .getElementById(
-            "eventModalBg"
-          )
-          .classList.contains(
-            "show"
-          )
-      ) {
+      login();
 
-        closeEventModal();
-      }
-
-
-      if (
-        document
-          .getElementById(
-            "loginModalBg"
-          )
-          .classList.contains(
-            "show"
-          )
-      ) {
-
-        closeLoginModal();
-      }
     }
+
   }
 );
 
 
 /* =========================================================
-   인증 상태 변화
+   Enter로 일정 저장
 ========================================================= */
 
-supabaseClient.auth.onAuthStateChange(
-  (_event, session) => {
+document.getElementById(
+  "eventText"
+).addEventListener(
+  "keydown",
+  event => {
 
-    currentUser =
-      session?.user ||
-      null;
+    if (
+      event.ctrlKey &&
+      event.key === "Enter"
+    ) {
 
+      saveEvent();
 
-    updateAuthUI();
+    }
+
   }
 );
 
 
 /* =========================================================
-   초기화
+   초기 실행
 ========================================================= */
 
 async function init() {
@@ -3435,6 +2867,7 @@ async function init() {
   await checkAuth();
 
   await loadEvents();
+
 }
 
 
