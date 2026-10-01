@@ -4,167 +4,871 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>루다의 2026 캘린더</title>
-  <!-- Supabase JS SDK -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root {
-      --bg: #f5f3f8; --card: #fff; --ink: #292731; --muted: #8c8895;
-      --line: #e7e3eb; --lav: #dcd5ef; --lav2: #f0ebf8; --blue: #4777c7; --red: #d86e75;
-      --yellow: #fff0bc; --gray: #dedede; --green: #dcebd3; --shadow: 0 18px 50px rgba(52, 42, 72, .09);
+      --bg: #f5f3f8;
+      --card: #fff;
+      --ink: #292731;
+      --muted: #8c8895;
+      --line: #e7e3eb;
+      --lav: #dcd5ef;
+      --lav2: #f0ebf8;
+      --blue: #4777c7;
+      --red: #d86e75;
+      --yellow: #fff0bc;
+      --gray: #dedede;
+      --green: #dcebd3;
+      --shadow: 0 18px 50px rgba(52, 42, 72, .09);
     }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: linear-gradient(135deg, #f7f5fa, #eeebf3); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans KR", sans-serif; }
-    button, input, select, textarea { font: inherit; }
-    button { cursor: pointer; }
-    
-    .app { max-width: 1450px; margin: 0 auto; padding: 28px; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 18px; }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .mark { width: 44px; height: 44px; border-radius: 14px; background: #cfc4e7; display: grid; place-items: center; font-weight: 800; color: #4d4560; box-shadow: inset 0 1px #fff; }
-    .brand h1 { font-size: 20px; margin: 0; }
-    .brand p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
-    .controls { display: flex; gap: 8px; align-items: center; }
-    .iconbtn, .todaybtn { border: 1px solid var(--line); background: #fff; border-radius: 11px; height: 38px; padding: 0 12px; color: #55505f; }
-    .iconbtn { width: 38px; padding: 0; font-size: 18px; }
-    .todaybtn { font-weight: 700; }
 
-    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; }
-    .calendar-card, .side { background: rgba(255, 255, 255, .88); border: 1px solid rgba(225, 220, 232, .9); border-radius: 22px; box-shadow: var(--shadow); overflow: hidden; }
-    
-    .monthhead { background: linear-gradient(90deg, #d9d0ec, #e4def1); padding: 22px 24px; display: flex; align-items: center; justify-content: space-between; }
-    .monthtitle { display: flex; align-items: baseline; gap: 12px; }
-    .monthtitle .year { font-size: 18px; font-weight: 800; }
-    .monthtitle .month { font-size: 31px; font-weight: 900; letter-spacing: -1px; }
-    .monthtitle .kr { font-size: 15px; font-weight: 700; color: #655d72; }
-    .monthnav { display: flex; gap: 8px; }
-    .monthnav button { border: 0; background: rgba(255, 255, 255, .55); width: 36px; height: 36px; border-radius: 10px; color: #51495e; }
+    * {
+      box-sizing: border-box;
+    }
 
-    .weekdays, .grid { display: grid; grid-template-columns: repeat(7, 1fr); }
-    .weekdays { background: #fbfafc; border-bottom: 1px solid var(--line); }
-    .weekday { height: 38px; display: grid; place-items: center; font-size: 12px; font-weight: 800; color: #77727d; }
-    .weekday.sat { color: var(--blue); }
-    .weekday.sun { color: var(--red); }
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #f7f5fa, #eeebf3);
+      color: var(--ink);
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Noto Sans KR",
+        sans-serif;
+    }
 
-    .grid { background: var(--line); gap: 1px; }
-    .day { min-height: 145px; background: #fff; padding: 10px; position: relative; display: flex; flex-direction: column; gap: 7px; transition: .15s; }
-    .day:hover { background: #fdfcff; }
-    .day.out { background: #faf9fb; color: #aaa; }
-    .daynum { font-size: 13px; font-weight: 800; align-self: flex-start; }
-    .day.sat .daynum { color: var(--blue); }
-    .day.sun .daynum { color: var(--red); }
-    .day.out .daynum { color: #999; }
+    button,
+    input,
+    select {
+      font: inherit;
+    }
 
-    .event { border-radius: 7px; padding: 9px 8px; font-size: 12px; line-height: 1.35; font-weight: 650; min-height: 42px; display: flex; align-items: center; justify-content: center; text-align: center; white-space: pre-line; cursor: pointer; transition: transform 0.1s; }
-    .event:hover { transform: scale(1.02); }
-    .event.gray { background: var(--gray); }
-    .event.yellow { background: var(--yellow); }
-    .event.green { background: var(--green); }
-    .event.purple { background: #e9e1f6; }
-    .event.blue { background: #dfeafb; }
+    button {
+      cursor: pointer;
+    }
 
-    .day.addable:after { content: '+'; position: absolute; right: 9px; bottom: 8px; width: 23px; height: 23px; border-radius: 8px; background: #f1eef5; color: #aaa; display: grid; place-items: center; opacity: 0; transition: .15s; }
-    .day.addable:hover:after { opacity: 1; }
+    .app {
+      max-width: 1450px;
+      margin: 0 auto;
+      padding: 28px;
+    }
 
-    .side { padding: 18px; }
-    .side h2 { font-size: 15px; margin: 2px 0 14px; }
-    .side-section { padding: 14px 0; border-bottom: 1px solid var(--line); }
-    .side-section:last-child { border-bottom: 0; }
-    .bigdate { font-size: 30px; font-weight: 900; letter-spacing: -1px; }
-    .muted { color: var(--muted); font-size: 12px; }
-    .eventrow { display: flex; gap: 10px; align-items: flex-start; margin: 11px 0; cursor: pointer; }
-    .dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 5px; flex: 0 0 auto; }
-    .dot.yellow { background: #e5bd45; }
-    .dot.gray { background: #a9a9a9; }
-    .dot.green { background: #7fac68; }
-    .dot.purple { background: #9a7bc5; }
-    .dot.blue { background: #4777c7; }
-    .eventrow strong { font-size: 13px; }
-    .eventrow span { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+    /* =========================
+       TOP
+    ========================= */
 
-    .add { width: 100%; border: 0; border-radius: 12px; background: #4e465b; color: #fff; padding: 11px 12px; font-weight: 800; margin-top: 8px; }
-    .hint { font-size: 11px; color: #9b96a2; line-height: 1.5; margin-top: 10px; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      gap: 18px;
+    }
 
-    .modal { position: fixed; inset: 0; background: rgba(37, 31, 47, .35); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 5; }
-    .modal.open { display: flex; }
-    .dialog { width: min(440px, 100%); background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 30px 80px rgba(20, 15, 30, .25); }
-    .dialog h3 { margin: 0 0 14px; }
-    .form { display: grid; gap: 11px; }
-    .form label { font-size: 12px; font-weight: 800; color: #67616d; }
-    .form input, .form select { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; outline: none; }
-    
-    .actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-    .actions-right { display: flex; gap: 8px; }
-    .actions button { border: 0; border-radius: 10px; padding: 10px 14px; cursor: pointer; }
-    .cancel { background: #f0edf3; }
-    .save { background: #4e465b; color: #fff; font-weight: 800; }
-    .delete-btn { background: #d86e75; color: #fff; font-weight: 800; display: none; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-    @media(max-width: 1050px) { .layout { grid-template-columns: 1fr; } .side { display: none; } .day { min-height: 120px; } }
-    @media(max-width: 680px) { .app { padding: 10px; } .topbar { margin-bottom: 10px; } .brand h1 { font-size: 16px; } .brand p { display: none; } .monthhead { padding: 16px; } .monthtitle .month { font-size: 24px; } .monthtitle .year { font-size: 14px; } .monthtitle .kr { display: none; } .day { min-height: 86px; padding: 6px; } .event { font-size: 10px; padding: 6px; min-height: 30px; } .weekday { height: 32px; font-size: 10px; } .daynum { font-size: 11px; } .todaybtn { display: none; } }
+    .mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: #cfc4e7;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: #4d4560;
+      box-shadow: inset 0 1px #fff;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .iconbtn,
+    .todaybtn,
+    .loginbtn,
+    .logoutbtn {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 11px;
+      height: 38px;
+      padding: 0 12px;
+      color: #55505f;
+    }
+
+    .iconbtn {
+      width: 38px;
+      padding: 0;
+      font-size: 18px;
+    }
+
+    .todaybtn {
+      font-weight: 700;
+    }
+
+    .loginbtn {
+      font-weight: 700;
+    }
+
+    .logoutbtn {
+      display: none;
+      background: #f3eff7;
+      font-weight: 700;
+    }
+
+    .admin-status {
+      display: none;
+      font-size: 11px;
+      color: #756d82;
+      padding: 0 4px;
+    }
+
+    /* =========================
+       LAYOUT
+    ========================= */
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 18px;
+    }
+
+    .calendar-card,
+    .side {
+      background: rgba(255, 255, 255, .88);
+      border: 1px solid rgba(225, 220, 232, .9);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    /* =========================
+       MONTH
+    ========================= */
+
+    .monthhead {
+      background: linear-gradient(90deg, #d9d0ec, #e4def1);
+      padding: 22px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .monthtitle {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .monthtitle .year {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .monthtitle .month {
+      font-size: 31px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    .monthtitle .kr {
+      font-size: 15px;
+      font-weight: 700;
+      color: #655d72;
+    }
+
+    .monthnav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .monthnav button {
+      border: 0;
+      background: rgba(255, 255, 255, .55);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      color: #51495e;
+    }
+
+    /* =========================
+       CALENDAR
+    ========================= */
+
+    .weekdays,
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .weekdays {
+      background: #fbfafc;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .weekday {
+      height: 38px;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #77727d;
+    }
+
+    .weekday.sat {
+      color: var(--blue);
+    }
+
+    .weekday.sun {
+      color: var(--red);
+    }
+
+    .grid {
+      background: var(--line);
+      gap: 1px;
+    }
+
+    .day {
+      min-height: 145px;
+      background: #fff;
+      padding: 10px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      transition: .15s;
+    }
+
+    .day:hover {
+      background: #fdfcff;
+    }
+
+    .day.out {
+      background: #faf9fb;
+      color: #aaa;
+    }
+
+    .daynum {
+      font-size: 13px;
+      font-weight: 800;
+      align-self: flex-start;
+    }
+
+    .day.sat .daynum {
+      color: var(--blue);
+    }
+
+    .day.sun .daynum {
+      color: var(--red);
+    }
+
+    .day.out .daynum {
+      color: #999;
+    }
+
+    .event {
+      border-radius: 7px;
+      padding: 9px 8px;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 650;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      white-space: pre-line;
+      cursor: pointer;
+      transition: transform .1s;
+    }
+
+    .event:hover {
+      transform: scale(1.02);
+    }
+
+    .event.gray {
+      background: var(--gray);
+    }
+
+    .event.yellow {
+      background: var(--yellow);
+    }
+
+    .event.green {
+      background: var(--green);
+    }
+
+    .event.purple {
+      background: #e9e1f6;
+    }
+
+    .event.blue {
+      background: #dfeafb;
+    }
+
+    .day.addable:after {
+      content: '+';
+      position: absolute;
+      right: 9px;
+      bottom: 8px;
+      width: 23px;
+      height: 23px;
+      border-radius: 8px;
+      background: #f1eef5;
+      color: #aaa;
+      display: grid;
+      place-items: center;
+      opacity: 0;
+      transition: .15s;
+    }
+
+    .day.addable:hover:after {
+      opacity: 1;
+    }
+
+    /* =========================
+       SIDE
+    ========================= */
+
+    .side {
+      padding: 18px;
+    }
+
+    .side h2 {
+      font-size: 15px;
+      margin: 2px 0 14px;
+    }
+
+    .side-section {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .side-section:last-child {
+      border-bottom: 0;
+    }
+
+    .bigdate {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .eventrow {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin: 11px 0;
+      cursor: pointer;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex: 0 0 auto;
+    }
+
+    .dot.yellow {
+      background: #e5bd45;
+    }
+
+    .dot.gray {
+      background: #a9a9a9;
+    }
+
+    .dot.green {
+      background: #7fac68;
+    }
+
+    .dot.purple {
+      background: #9a7bc5;
+    }
+
+    .dot.blue {
+      background: #4777c7;
+    }
+
+    .eventrow strong {
+      font-size: 13px;
+    }
+
+    .eventrow span {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .add {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      background: #4e465b;
+      color: #fff;
+      padding: 11px 12px;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #9b96a2;
+      line-height: 1.5;
+      margin-top: 10px;
+    }
+
+    /* =========================
+       LOGIN MODAL
+    ========================= */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(37, 31, 47, .35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 10;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .dialog {
+      width: min(440px, 100%);
+      background: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 30px 80px rgba(20, 15, 30, .25);
+    }
+
+    .dialog h3 {
+      margin: 0 0 14px;
+    }
+
+    .dialog p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .form {
+      display: grid;
+      gap: 11px;
+    }
+
+    .form label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #67616d;
+    }
+
+    .form input,
+    .form select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      margin-top: 6px;
+    }
+
+    .form input:focus,
+    .form select:focus {
+      border-color: #b8acd0;
+      box-shadow: 0 0 0 3px #f0ebf8;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .actions button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+
+    .cancel {
+      background: #f0edf3;
+    }
+
+    .save {
+      background: #4e465b;
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .delete-btn {
+      background: #d86e75;
+      color: #fff;
+      font-weight: 800;
+      margin-right: auto;
+    }
+
+    .error {
+      display: none;
+      background: #fff0f1;
+      color: #b54d56;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    /* =========================
+       LOADING
+    ========================= */
+
+    .loading {
+      position: fixed;
+      inset: 0;
+      background: rgba(247, 245, 250, .75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      backdrop-filter: blur(3px);
+    }
+
+    .loading.show {
+      display: flex;
+    }
+
+    .loading-box {
+      background: #fff;
+      padding: 18px 24px;
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media(max-width: 1050px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .side {
+        display: none;
+      }
+
+      .day {
+        min-height: 120px;
+      }
+    }
+
+    @media(max-width: 680px) {
+      .app {
+        padding: 10px;
+      }
+
+      .topbar {
+        margin-bottom: 10px;
+      }
+
+      .brand h1 {
+        font-size: 16px;
+      }
+
+      .brand p {
+        display: none;
+      }
+
+      .monthhead {
+        padding: 16px;
+      }
+
+      .monthtitle .month {
+        font-size: 24px;
+      }
+
+      .monthtitle .year {
+        font-size: 14px;
+      }
+
+      .monthtitle .kr {
+        display: none;
+      }
+
+      .day {
+        min-height: 86px;
+        padding: 6px;
+      }
+
+      .event {
+        font-size: 10px;
+        padding: 6px;
+        min-height: 30px;
+      }
+
+      .weekday {
+        height: 32px;
+        font-size: 10px;
+      }
+
+      .daynum {
+        font-size: 11px;
+      }
+
+      .todaybtn {
+        display: none;
+      }
+
+      .admin-status {
+        display: none !important;
+      }
+    }
   </style>
 </head>
+
 <body>
+
   <div class="app">
+
+    <!-- 상단 -->
     <div class="topbar">
+
       <div class="brand">
         <div class="mark">L</div>
+
         <div>
           <h1>루다의 캘린더</h1>
           <p>일정은 한눈에, 기록은 가볍게</p>
         </div>
       </div>
+
       <div class="controls">
-        <button class="todaybtn" id="todayBtn">오늘</button>
-        <button class="iconbtn" id="addBtn" title="일정 추가">＋</button>
+
+        <span class="admin-status" id="adminStatus">
+          관리자 로그인됨
+        </span>
+
+        <button class="todaybtn" id="todayBtn">
+          오늘
+        </button>
+
+        <button class="loginbtn" id="loginBtn">
+          관리자 로그인
+        </button>
+
+        <button class="logoutbtn" id="logoutBtn">
+          로그아웃
+        </button>
+
+        <button class="iconbtn" id="addBtn" title="일정 추가">
+          ＋
+        </button>
+
       </div>
     </div>
-    
+
+
+    <!-- 본문 -->
     <div class="layout">
+
       <main class="calendar-card">
+
         <div class="monthhead">
+
           <div class="monthtitle">
             <span class="year" id="year"></span>
             <span class="month" id="month"></span>
             <span class="kr">월</span>
           </div>
+
           <div class="monthnav">
             <button class="iconbtn" id="prev">‹</button>
             <button class="iconbtn" id="next">›</button>
           </div>
+
         </div>
+
+
         <div class="weekdays">
-          <div class="weekday">월</div><div class="weekday">화</div><div class="weekday">수</div>
-          <div class="weekday">목</div><div class="weekday">금</div><div class="weekday sat">토</div>
+          <div class="weekday">월</div>
+          <div class="weekday">화</div>
+          <div class="weekday">수</div>
+          <div class="weekday">목</div>
+          <div class="weekday">금</div>
+          <div class="weekday sat">토</div>
           <div class="weekday sun">일</div>
         </div>
+
+
         <div class="grid" id="grid"></div>
+
       </main>
-      
+
+
       <aside class="side">
+
         <div class="side-section">
-          <div class="muted" id="selectedLabel">선택한 날짜</div>
-          <div class="bigdate" id="selectedDate">10.01</div>
+
+          <div class="muted" id="selectedLabel">
+            선택한 날짜
+          </div>
+
+          <div class="bigdate" id="selectedDate">
+            10.01
+          </div>
+
         </div>
+
+
         <div class="side-section">
+
           <h2>이번 달 일정</h2>
+
           <div id="upcoming"></div>
+
         </div>
+
+
         <div class="side-section">
-          <button class="add" id="sideAdd">+ 일정 추가</button>
-          <div class="hint">일정을 클릭하면 **수정**하거나 **삭제**할 수 있습니다.</div>
+
+          <button class="add" id="sideAdd">
+            + 일정 추가
+          </button>
+
+          <div class="hint" id="sideHint">
+            관리자 로그인 후 일정을 추가하거나 수정할 수 있습니다.
+          </div>
+
         </div>
+
       </aside>
+
     </div>
+
   </div>
 
-  <!-- 일정 추가/수정 모달 -->
-  <div class="modal" id="modal">
+
+  <!-- =========================
+       로그인 모달
+  ========================== -->
+
+  <div class="modal" id="loginModal">
+
     <div class="dialog">
-      <h3 id="modalTitle">일정 추가</h3>
+
+      <h3>관리자 로그인</h3>
+
+      <p>
+        관리자 계정으로 로그인하면 일정 추가, 수정, 삭제가 가능합니다.
+      </p>
+
       <div class="form">
-        <label>날짜<input type="date" id="dateInput"></label>
-        <label>일정 내용<input id="titleInput" placeholder="예: 영화 / 휴방 / 약속"></label>
-        <label>색상
+
+        <label>
+          이메일
+          <input
+            type="email"
+            id="emailInput"
+            placeholder="관리자 이메일"
+            autocomplete="email"
+          />
+        </label>
+
+        <label>
+          비밀번호
+          <input
+            type="password"
+            id="passwordInput"
+            placeholder="비밀번호"
+            autocomplete="current-password"
+          />
+        </label>
+
+        <div class="error" id="loginError"></div>
+
+        <div class="actions">
+
+          <button class="cancel" id="loginCancel">
+            취소
+          </button>
+
+          <button class="save" id="loginSubmit">
+            로그인
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       일정 추가/수정 모달
+  ========================== -->
+
+  <div class="modal" id="eventModal">
+
+    <div class="dialog">
+
+      <h3 id="modalTitle">
+        일정 추가
+      </h3>
+
+      <div class="form">
+
+        <label>
+          날짜
+          <input type="date" id="dateInput" />
+        </label>
+
+        <label>
+          일정 내용
+          <input
+            id="titleInput"
+            placeholder="예: 영화 / 휴방 / 약속"
+          />
+        </label>
+
+        <label>
+          색상
+
           <select id="colorInput">
             <option value="gray">회색</option>
             <option value="yellow">노랑</option>
@@ -172,243 +876,1259 @@
             <option value="purple">보라</option>
             <option value="blue">파랑</option>
           </select>
+
         </label>
-        
+
         <div class="actions">
-          <button class="delete-btn" id="deleteBtn">삭제</button>
-          <div class="actions-right">
-            <button class="cancel" id="cancel">취소</button>
-            <button class="save" id="save">저장</button>
-          </div>
+
+          <button class="delete-btn" id="deleteBtn">
+            삭제
+          </button>
+
+          <button class="cancel" id="eventCancel">
+            취소
+          </button>
+
+          <button class="save" id="eventSave">
+            저장
+          </button>
+
         </div>
+
       </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- 로딩 -->
+
+  <div class="loading" id="loading">
+    <div class="loading-box">
+      처리 중...
     </div>
   </div>
 
-  <script>
-    // 1. Supabase 설정
-    const SUPABASE_URL = 'https://invachujoiisrbhkzhzc.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_1-PfSu1n9AE0PdTKTQExFA_tIsfTJmZ'; // 본인 키로 교체하세요
 
-    let supabaseClient = null;
-    if (typeof supabase !== 'undefined' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY') {
-      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+
+  /* =========================================================
+     SUPABASE 설정
+  ========================================================= */
+
+  const SUPABASE_URL =
+    'https://invachujoiisrbhkzhzc.supabase.co';
+
+  const SUPABASE_ANON_KEY =
+    'sb_publishable_1-PfSu1n9AE0PdTKTQExFA_tIsfTJmZ';
+
+
+  const supabaseClient =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+
+  /* =========================================================
+     상태
+  ========================================================= */
+
+  let events = [];
+
+  let currentEditId = null;
+
+  let isAdmin = false;
+
+  let view = new Date(2026, 9, 1);
+
+  let selected = new Date(2026, 9, 1);
+
+
+  const $ = id =>
+    document.getElementById(id);
+
+
+  /* =========================================================
+     날짜
+  ========================================================= */
+
+  function iso(d) {
+
+    return `${d.getFullYear()}-${
+      String(d.getMonth() + 1).padStart(2, '0')
+    }-${
+      String(d.getDate()).padStart(2, '0')
+    }`;
+
+  }
+
+
+  /* =========================================================
+     HTML escape
+  ========================================================= */
+
+  function escapeHtml(value) {
+
+    return String(value || '').replace(
+      /[&<>"']/g,
+      c => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      }[c])
+    );
+
+  }
+
+
+  /* =========================================================
+     로딩
+  ========================================================= */
+
+  function setLoading(show) {
+
+    $('loading').classList.toggle('show', show);
+
+  }
+
+
+  /* =========================================================
+     관리자 UI
+  ========================================================= */
+
+  function updateAdminUI() {
+
+    $('loginBtn').style.display =
+      isAdmin ? 'none' : 'block';
+
+    $('logoutBtn').style.display =
+      isAdmin ? 'block' : 'none';
+
+    $('adminStatus').style.display =
+      isAdmin ? 'block' : 'none';
+
+    $('addBtn').style.display =
+      isAdmin ? 'block' : 'none';
+
+    $('sideAdd').style.display =
+      isAdmin ? 'block' : 'none';
+
+    $('sideHint').textContent =
+      isAdmin
+        ? '일정을 클릭하면 수정하거나 삭제할 수 있습니다.'
+        : '일정을 보려면 클릭할 필요가 없습니다. 관리자만 일정을 관리할 수 있습니다.';
+
+    render();
+
+  }
+
+
+  /* =========================================================
+     로그인 상태 확인
+  ========================================================= */
+
+  async function checkAuth() {
+
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.getSession();
+
+    if (error) {
+
+      console.error(error);
+
+      isAdmin = false;
+
+    } else {
+
+      isAdmin = !!data.session;
+
     }
 
-    const initialEvents = [
-      { id: '1', date: '2026-09-29', title: '휴방', color: 'gray' },
-      { id: '2', date: '2026-09-30', title: '휴방', color: 'gray' },
-      { id: '3', date: '2026-10-01', title: '예소노탐정', color: 'green' },
-      { id: '4', date: '2026-10-02', title: 'Graveyard Keeper 2', color: 'gray' },
-      { id: '5', date: '2026-10-03', title: 'Graveyard Keeper 2\n<에반게리온 극장판>', color: 'gray' },
-      { id: '6', date: '2026-10-07', title: '휴방', color: 'gray' },
-      { id: '7', date: '2026-10-08', title: '휴방', color: 'gray' },
-      { id: '8', date: '2026-10-10', title: '루다극장', color: 'yellow' },
-      { id: '9', date: '2026-10-14', title: '휴방', color: 'gray' },
-      { id: '10', date: '2026-10-17', title: '휴방', color: 'gray' },
-      { id: '11', date: '2026-10-21', title: '휴방', color: 'gray' },
-      { id: '12', date: '2026-10-23', title: '코요웹투터:\n모던웹메어', color: 'purple' },
-      { id: '13', date: '2026-10-24', title: '루다극장', color: 'yellow' },
-      { id: '14', date: '2026-10-25', title: '휴방', color: 'gray' },
-      { id: '15', date: '2026-10-29', title: '휴방', color: 'gray' },
-      { id: '16', date: '2026-10-30', title: '휴방', color: 'gray' },
-      { id: '17', date: '2026-11-02', title: '여름방학 끝! 복귀', color: 'green' }
-    ];
+    updateAdminUI();
 
-    let events = JSON.parse(localStorage.getItem('ludaCalendarEvents') || 'null') || initialEvents;
-    let currentEditId = null; // 현재 수정 중인 일정 ID (null이면 새 일정 추가)
+  }
 
-    let view = new Date(2026, 9, 1);
-    let selected = new Date(2026, 9, 1);
 
-    const $ = id => document.getElementById(id);
+  /* =========================================================
+     Supabase에서 일정 불러오기
+  ========================================================= */
 
-    function iso(d) {
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    }
+  async function loadEvents() {
 
-    async function loadEventsFromSupabase() {
-      if (!supabaseClient) return;
-      try {
-        const { data, error } = await supabaseClient.from('events').select('*');
-        if (!error && data && data.length > 0) {
-          events = data;
-          persist();
-          render();
-        }
-      } catch (e) {
-        console.error('Supabase 데이터 로드 실패:', e);
+    setLoading(true);
+
+    try {
+
+      const {
+        data,
+        error
+      } = await supabaseClient
+        .from('events')
+        .select('*')
+        .order('date', { ascending: true });
+
+
+      if (error) {
+
+        console.error(
+          '일정 불러오기 실패:',
+          error
+        );
+
+        alert(
+          '일정을 불러오지 못했습니다.\n\n' +
+          error.message
+        );
+
+        events = [];
+
+      } else {
+
+        events = data || [];
+
       }
+
+      render();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        '서버와 연결하는 중 문제가 발생했습니다.'
+      );
+
+    } finally {
+
+      setLoading(false);
+
     }
 
-    function render() {
-      $('year').textContent = view.getFullYear();$('month').textContent = view.getMonth() + 1;
+  }
 
-      const first = new Date(view.getFullYear(), view.getMonth(), 1);
-      let start = (first.getDay() + 6) % 7;
-      const days = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
-      const prevDays = new Date(view.getFullYear(), view.getMonth(), 0).getDate();
 
-      let html = '';
-      for (let i = 0; i < 42; i++) {
-        let n = i - start + 1;
-        let d = new Date(view.getFullYear(), view.getMonth(), n);
-        let out = n < 1 || n > days;
-        let actual = n < 1 ? prevDays + n : n > days ? n - days : n;
-        
-        let cls = 'day addable';
-        let dow = i % 7;
-        if (dow === 5) cls += ' sat';
-        if (dow === 6) cls += ' sun';
-        if (out) cls += ' out';
+  /* =========================================================
+     달력 렌더링
+  ========================================================= */
 
-        let ev = events.filter(e => e.date === iso(d));
-        
-        html += `<div class="${cls}" data-date="${iso(d)}">
-          <div class="daynum">${actual}</div>
-          ${ev.map(e => `<div class="event ${e.color}" data-id="${e.id}" title="수정/삭제하려면 클릭">${escapeHtml(e.title)}</div>`).join('')}
-        </div>`;
+  function render() {
+
+    $('year').textContent =
+      view.getFullYear();
+
+    $('month').textContent =
+      view.getMonth() + 1;
+
+
+    const first =
+      new Date(
+        view.getFullYear(),
+        view.getMonth(),
+        1
+      );
+
+
+    const start =
+      (first.getDay() + 6) % 7;
+
+
+    const days =
+      new Date(
+        view.getFullYear(),
+        view.getMonth() + 1,
+        0
+      ).getDate();
+
+
+    let html = '';
+
+
+    for (let i = 0; i < 42; i++) {
+
+      const n =
+        i - start + 1;
+
+
+      const d =
+        new Date(
+          view.getFullYear(),
+          view.getMonth(),
+          n
+        );
+
+
+      const out =
+        n < 1 || n > days;
+
+
+      const actual =
+        n < 1
+          ? new Date(
+              view.getFullYear(),
+              view.getMonth(),
+              0
+            ).getDate() + n
+          : n > days
+            ? n - days
+            : n;
+
+
+      let cls =
+        'day';
+
+
+      if (isAdmin) {
+
+        cls += ' addable';
+
       }
 
-      $('grid').innerHTML = html;
 
-      // 일정 및 날짜 클릭 이벤트 바인딩
-      document.querySelectorAll('.day').forEach(el => {
-        el.addEventListener('click', e => {
-          const targetEvent = e.target.closest('.event');
-          if (targetEvent) {
-            e.stopPropagation();
-            const id = targetEvent.dataset.id;
-            openEditModal(id);
-            return;
+      const dow = i % 7;
+
+
+      if (dow === 5)
+        cls += ' sat';
+
+
+      if (dow === 6)
+        cls += ' sun';
+
+
+      if (out)
+        cls += ' out';
+
+
+      const dateString =
+        iso(d);
+
+
+      const dayEvents =
+        events.filter(
+          e => e.date === dateString
+        );
+
+
+      html += `
+
+        <div
+          class="${cls}"
+          data-date="${dateString}"
+        >
+
+          <div class="daynum">
+            ${actual}
+          </div>
+
+          ${dayEvents.map(e => `
+
+            <div
+              class="event ${escapeHtml(e.color)}"
+              data-id="${escapeHtml(e.id)}"
+              title="${
+                isAdmin
+                  ? '수정/삭제하려면 클릭'
+                  : ''
+              }"
+            >
+              ${escapeHtml(e.title)}
+            </div>
+
+          `).join('')}
+
+        </div>
+
+      `;
+
+    }
+
+
+    $('grid').innerHTML = html;
+
+
+    document
+      .querySelectorAll('.day')
+      .forEach(day => {
+
+        day.addEventListener(
+          'click',
+          e => {
+
+            const target =
+              e.target.closest('.event');
+
+
+            /* 일정 클릭 */
+
+            if (target) {
+
+              e.stopPropagation();
+
+
+              if (!isAdmin) {
+
+                return;
+
+              }
+
+
+              openEditModal(
+                target.dataset.id
+              );
+
+
+              return;
+
+            }
+
+
+            /* 관리자만 날짜 클릭으로 추가 */
+
+            if (!isAdmin) {
+
+              return;
+
+            }
+
+
+            const date =
+              day.dataset.date;
+
+
+            selected =
+              new Date(
+                date + 'T12:00:00'
+              );
+
+
+            openAddModal(date);
+
           }
-          selected = new Date(el.dataset.date + 'T12:00:00');
-          openAddModal(el.dataset.date);
-        });
+        );
+
       });
 
-      renderSide();
-    }
 
-    function escapeHtml(s) {
-      return (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c]));
-    }
+    renderSide();
 
-    function renderSide() {
-      $('selectedDate').textContent = `${String(selected.getMonth() + 1).padStart(2, '0')}.${String(selected.getDate()).padStart(2, '0')}`;
-      const label = selected.toLocaleDateString('ko-KR', { weekday: 'long' });
-      $('selectedLabel').textContent = label;
+  }
 
-      const monthKey = `${view.getFullYear()}-${String(view.getMonth() + 1).padStart(2, '0')}`;
-      const list = events.filter(e => e.date.startsWith(monthKey)).sort((a, b) => a.date.localeCompare(b.date));
 
-      $('upcoming').innerHTML = list.length 
-        ? list.map(e => `<div class="eventrow" onclick="openEditModal('${e.id}')">
-            <i class="dot ${e.color}"></i>
-            <div>
-              <strong>${escapeHtml(e.title).replaceAll('\n', '<br>')}</strong>
-              <span>${e.date.slice(5).replace('-', '.')}</span>
+  /* =========================================================
+     오른쪽 일정 목록
+  ========================================================= */
+
+  function renderSide() {
+
+    $('selectedDate').textContent =
+      `${String(
+        selected.getMonth() + 1
+      ).padStart(2, '0')}.${String(
+        selected.getDate()
+      ).padStart(2, '0')}`;
+
+
+    $('selectedLabel').textContent =
+      selected.toLocaleDateString(
+        'ko-KR',
+        {
+          weekday: 'long'
+        }
+      );
+
+
+    const monthKey =
+      `${view.getFullYear()}-${
+        String(view.getMonth() + 1)
+          .padStart(2, '0')
+      }`;
+
+
+    const list =
+      events
+        .filter(
+          e => e.date.startsWith(monthKey)
+        )
+        .sort(
+          (a, b) =>
+            a.date.localeCompare(b.date)
+        );
+
+
+    $('upcoming').innerHTML =
+      list.length
+
+        ? list.map(e => `
+
+            <div
+              class="eventrow"
+              ${
+                isAdmin
+                  ? `onclick="openEditModal('${escapeHtml(e.id)}')"`
+                  : ''
+              }
+            >
+
+              <i class="dot ${escapeHtml(e.color)}"></i>
+
+              <div>
+
+                <strong>
+                  ${escapeHtml(e.title)
+                    .replaceAll(
+                      '\n',
+                      '<br>'
+                    )}
+                </strong>
+
+                <span>
+                  ${e.date.slice(5)
+                    .replace('-', '.')}
+                </span>
+
+              </div>
+
             </div>
-          </div>`).join('') 
+
+          `).join('')
+
         : '<div class="muted">등록된 일정이 없어요.</div>';
+
+  }
+
+
+  /* =========================================================
+     로그인 모달
+  ========================================================= */
+
+  function openLoginModal() {
+
+    $('emailInput').value = '';
+
+    $('passwordInput').value = '';
+
+    $('loginError').style.display =
+      'none';
+
+    $('loginModal')
+      .classList.add('open');
+
+    setTimeout(
+      () => $('emailInput').focus(),
+      50
+    );
+
+  }
+
+
+  function closeLoginModal() {
+
+    $('loginModal')
+      .classList.remove('open');
+
+  }
+
+
+  async function login() {
+
+    const email =
+      $('emailInput').value.trim();
+
+    const password =
+      $('passwordInput').value;
+
+
+    if (!email || !password) {
+
+      showLoginError(
+        '이메일과 비밀번호를 입력해주세요.'
+      );
+
+      return;
+
     }
 
-    function persist() {
-      localStorage.setItem('ludaCalendarEvents', JSON.stringify(events));
-    }
 
-    // 새 일정 추가 모달 열기
-    function openAddModal(date = iso(selected)) {
-      currentEditId = null;
-      $('modalTitle').textContent = '일정 추가';
-      $('deleteBtn').style.display = 'none';$('dateInput').value = date;
-      $('titleInput').value = '';
-      $('colorInput').value = 'gray';$('modal').classList.add('open');
-      setTimeout(() => $('titleInput').focus(), 50);
-    }
+    setLoading(true);
 
-    // 기존 일정 수정 모달 열기
-    function openEditModal(id) {
-      const item = events.find(e => String(e.id) === String(id));
-      if (!item) return;
 
-      currentEditId = id;
-      $('modalTitle').textContent = '일정 수정';
-      $('deleteBtn').style.display = 'block';$('dateInput').value = item.date;
-      $('titleInput').value = item.title;
-      $('colorInput').value = item.color \vert{}\vert{} 'gray';$('modal').classList.add('open');
-      setTimeout(() => $('titleInput').focus(), 50);
-    }
+    try {
 
-    function closeModal() {
-      $('modal').classList.remove('open');
-    }
+      const {
+        data,
+        error
+      } =
+        await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
 
-    // 일정 저장/수정 함수
-    async function saveEvent() {
-      const date = $('dateInput').value;
-      const title = $('titleInput').value.trim();
-      const color = $('colorInput').value;
 
-      if (!date || !title) return alert('날짜와 일정을 입력해 주세요.');
+      if (error) {
 
-      if (currentEditId) {
-        // 기존 일정 수정
-        const targetIndex = events.findIndex(e => String(e.id) === String(currentEditId));
-        if (targetIndex !== -1) {
-          events[targetIndex] = { ...events[targetIndex], date, title, color };
-          
-          if (supabaseClient) {
-            await supabaseClient.from('events').update({ date, title, color }).eq('id', currentEditId);
-          }
-        }
-      } else {
-        // 새 일정 추가
-        const newObj = { id: Date.now().toString(), date, title, color };
-        events.push(newObj);
+        showLoginError(
+          error.message
+        );
 
-        if (supabaseClient) {
-          await supabaseClient.from('events').insert([newObj]);
-        }
+        return;
+
       }
 
-      persist();
-      selected = new Date(date + 'T12:00:00');
-      view = new Date(selected.getFullYear(), selected.getMonth(), 1);
-      closeModal();
-      render();
-    }
 
-    // 일정 삭제 함수
-    async function deleteEvent() {
-      if (!currentEditId) return;
-      if (!confirm('이 일정을 삭제하시겠습니까?')) return;
+      if (!data.session) {
 
-      events = events.filter(e => String(e.id) !== String(currentEditId));
+        showLoginError(
+          '로그인 세션을 만들지 못했습니다.'
+        );
 
-      if (supabaseClient) {
-        await supabaseClient.from('events').delete().eq('id', currentEditId);
+        return;
+
       }
 
-      persist();
-      closeModal();
-      render();
+
+      isAdmin = true;
+
+      closeLoginModal();
+
+      updateAdminUI();
+
+      alert('관리자로 로그인되었습니다.');
+
+    } catch (error) {
+
+      console.error(error);
+
+      showLoginError(
+        '로그인 중 문제가 발생했습니다.'
+      );
+
+    } finally {
+
+      setLoading(false);
+
     }
 
-    // 이벤트 리스너 바인딩
-    $('prev').onclick = () => { view = new Date(view.getFullYear(), view.getMonth() - 1, 1); render(); };$('next').onclick = () => { view = new Date(view.getFullYear(), view.getMonth() + 1, 1); render(); };
-    $('todayBtn').onclick = () => { view = new Date(); selected = new Date(); render(); };$('addBtn').onclick = () => openAddModal();
-    $('sideAdd').onclick = () => openAddModal();$('cancel').onclick = closeModal;
-    $('save').onclick = saveEvent;
-    $('deleteBtn').onclick = deleteEvent;
+  }
 
-    $('modal').addEventListener('click', e => {
-      if (e.target.id === 'modal') closeModal();
-    });
 
-    // 초기화 실행
+  function showLoginError(message) {
+
+    const el =
+      $('loginError');
+
+    el.textContent =
+      message;
+
+    el.style.display =
+      'block';
+
+  }
+
+
+  /* =========================================================
+     로그아웃
+  ========================================================= */
+
+  async function logout() {
+
+    const ok =
+      confirm(
+        '관리자 로그아웃을 하시겠습니까?'
+      );
+
+
+    if (!ok)
+      return;
+
+
+    await supabaseClient.auth.signOut();
+
+    isAdmin = false;
+
+    updateAdminUI();
+
+  }
+
+
+  /* =========================================================
+     일정 추가 모달
+  ========================================================= */
+
+  function openAddModal(
+    date = iso(selected)
+  ) {
+
+    if (!isAdmin) {
+
+      alert(
+        '일정을 추가하려면 관리자 로그인이 필요합니다.'
+      );
+
+      return;
+
+    }
+
+
+    currentEditId = null;
+
+
+    $('modalTitle').textContent =
+      '일정 추가';
+
+
+    $('deleteBtn').style.display =
+      'none';
+
+
+    $('dateInput').value =
+      date;
+
+
+    $('titleInput').value =
+      '';
+
+
+    $('colorInput').value =
+      'gray';
+
+
+    $('eventModal')
+      .classList.add('open');
+
+
+    setTimeout(
+      () => $('titleInput').focus(),
+      50
+    );
+
+  }
+
+
+  /* =========================================================
+     일정 수정 모달
+  ========================================================= */
+
+  function openEditModal(id) {
+
+    if (!isAdmin)
+      return;
+
+
+    const item =
+      events.find(
+        e => String(e.id) === String(id)
+      );
+
+
+    if (!item)
+      return;
+
+
+    currentEditId =
+      item.id;
+
+
+    $('modalTitle').textContent =
+      '일정 수정';
+
+
+    $('deleteBtn').style.display =
+      'block';
+
+
+    $('dateInput').value =
+      item.date;
+
+
+    $('titleInput').value =
+      item.title;
+
+
+    $('colorInput').value =
+      item.color || 'gray';
+
+
+    $('eventModal')
+      .classList.add('open');
+
+
+    setTimeout(
+      () => $('titleInput').focus(),
+      50
+    );
+
+  }
+
+
+  function closeEventModal() {
+
+    $('eventModal')
+      .classList.remove('open');
+
+  }
+
+
+  /* =========================================================
+     일정 저장
+  ========================================================= */
+
+  async function saveEvent() {
+
+    if (!isAdmin) {
+
+      alert(
+        '관리자 로그인 후 이용해주세요.'
+      );
+
+      return;
+
+    }
+
+
+    const date =
+      $('dateInput').value;
+
+
+    const title =
+      $('titleInput').value.trim();
+
+
+    const color =
+      $('colorInput').value;
+
+
+    if (!date || !title) {
+
+      alert(
+        '날짜와 일정 내용을 입력해주세요.'
+      );
+
+      return;
+
+    }
+
+
+    setLoading(true);
+
+
+    try {
+
+      /* -------------------------
+         수정
+      ------------------------- */
+
+      if (currentEditId !== null) {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .from('events')
+            .update({
+              date,
+              title,
+              color
+            })
+            .eq(
+              'id',
+              currentEditId
+            )
+            .select()
+            .single();
+
+
+        if (error) {
+
+          console.error(error);
+
+          alert(
+            '일정 수정에 실패했습니다.\n\n' +
+            error.message
+          );
+
+          return;
+
+        }
+
+
+        const index =
+          events.findIndex(
+            e =>
+              String(e.id) ===
+              String(currentEditId)
+          );
+
+
+        if (index !== -1) {
+
+          events[index] =
+            data;
+
+        }
+
+      }
+
+      /* -------------------------
+         새 일정
+      ------------------------- */
+
+      else {
+
+        const newEvent = {
+
+          id:
+            crypto.randomUUID(),
+
+          date,
+
+          title,
+
+          color
+
+        };
+
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .from('events')
+            .insert(newEvent)
+            .select()
+            .single();
+
+
+        if (error) {
+
+          console.error(error);
+
+          alert(
+            '일정 저장에 실패했습니다.\n\n' +
+            error.message
+          );
+
+          return;
+
+        }
+
+
+        events.push(data);
+
+      }
+
+
+      selected =
+        new Date(
+          date + 'T12:00:00'
+        );
+
+
+      view =
+        new Date(
+          selected.getFullYear(),
+          selected.getMonth(),
+          1
+        );
+
+
+      closeEventModal();
+
+      render();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        '일정을 저장하는 중 문제가 발생했습니다.'
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  }
+
+
+  /* =========================================================
+     일정 삭제
+  ========================================================= */
+
+  async function deleteEvent() {
+
+    if (!isAdmin)
+      return;
+
+
+    if (currentEditId === null)
+      return;
+
+
+    const ok =
+      confirm(
+        '이 일정을 삭제하시겠습니까?'
+      );
+
+
+    if (!ok)
+      return;
+
+
+    setLoading(true);
+
+
+    try {
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from('events')
+          .delete()
+          .eq(
+            'id',
+            currentEditId
+          );
+
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          '일정 삭제에 실패했습니다.\n\n' +
+          error.message
+        );
+
+        return;
+
+      }
+
+
+      events =
+        events.filter(
+          e =>
+            String(e.id) !==
+            String(currentEditId)
+        );
+
+
+      currentEditId =
+        null;
+
+
+      closeEventModal();
+
+      render();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        '일정을 삭제하는 중 문제가 발생했습니다.'
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  }
+
+
+  /* =========================================================
+     버튼
+  ========================================================= */
+
+  $('prev').onclick = () => {
+
+    view =
+      new Date(
+        view.getFullYear(),
+        view.getMonth() - 1,
+        1
+      );
+
     render();
-    loadEventsFromSupabase();
-  </script>
+
+  };
+
+
+  $('next').onclick = () => {
+
+    view =
+      new Date(
+        view.getFullYear(),
+        view.getMonth() + 1,
+        1
+      );
+
+    render();
+
+  };
+
+
+  $('todayBtn').onclick = () => {
+
+    const now =
+      new Date();
+
+    view =
+      new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        1
+      );
+
+    selected =
+      new Date();
+
+    render();
+
+  };
+
+
+  $('loginBtn').onclick =
+    openLoginModal;
+
+
+  $('logoutBtn').onclick =
+    logout;
+
+
+  $('addBtn').onclick =
+    () => openAddModal();
+
+
+  $('sideAdd').onclick =
+    () => openAddModal();
+
+
+  $('loginCancel').onclick =
+    closeLoginModal;
+
+
+  $('loginSubmit').onclick =
+    login;
+
+
+  $('eventCancel').onclick =
+    closeEventModal;
+
+
+  $('eventSave').onclick =
+    saveEvent;
+
+
+  $('deleteBtn').onclick =
+    deleteEvent;
+
+
+  /* =========================================================
+     엔터키 로그인
+  ========================================================= */
+
+  $('passwordInput')
+    .addEventListener(
+      'keydown',
+      e => {
+
+        if (e.key === 'Enter') {
+
+          login();
+
+        }
+
+      }
+    );
+
+
+  /* =========================================================
+     모달 바깥 클릭
+  ========================================================= */
+
+  $('loginModal')
+    .addEventListener(
+      'click',
+      e => {
+
+        if (
+          e.target ===
+          $('loginModal')
+        ) {
+
+          closeLoginModal();
+
+        }
+
+      }
+    );
+
+
+  $('eventModal')
+    .addEventListener(
+      'click',
+      e => {
+
+        if (
+          e.target ===
+          $('eventModal')
+        ) {
+
+          closeEventModal();
+
+        }
+
+      }
+    );
+
+
+  /* =========================================================
+     Supabase 로그인 상태 변화 감지
+  ========================================================= */
+
+  supabaseClient.auth.onAuthStateChange(
+    (_event, session) => {
+
+      isAdmin =
+        !!session;
+
+      updateAdminUI();
+
+    }
+  );
+
+
+  /* =========================================================
+     시작
+  ========================================================= */
+
+  async function init() {
+
+    render();
+
+    await checkAuth();
+
+    await loadEvents();
+
+  }
+
+
+  init();
+
+</script>
+
 </body>
 </html>
