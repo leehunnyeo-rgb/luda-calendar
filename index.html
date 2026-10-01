@@ -1516,14 +1516,14 @@ async function loadEvents() {
       error
     } =
       await supabaseClient
-.from("events")
-.select("*")
-.order("date", {
-  ascending: true
-})
-.order("sort_order", {
-  ascending: true
-});
+        .from("events")
+        .select("*")
+        .order("date", {
+         ascending: true
+        })
+        .order("sort_order", {
+          ascending: true
+        });
 
     
     if (error) {
