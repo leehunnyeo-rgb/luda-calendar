@@ -327,7 +327,10 @@ button:disabled {
     color: var(--purple);
 }
 
-/* 요일 */
+/* ==============================
+   요일
+   월 화 수 목 금 토 일
+============================== */
 
 .weekdays {
     display: grid;
@@ -344,12 +347,14 @@ button:disabled {
     font-weight: 800;
 }
 
-.weekday:first-child {
-    color: #ef6b83;
+/* 토요일 파랑 */
+.weekday:nth-child(6) {
+    color: #6c8bd8;
 }
 
-.weekday:last-child {
-    color: #6c8bd8;
+/* 일요일 빨강 */
+.weekday:nth-child(7) {
+    color: #ef6b83;
 }
 
 /* ==============================
@@ -769,9 +774,7 @@ button:disabled {
 
 <div class="container">
 
-    <!-- =========================
-         상단
-    ========================== -->
+    <!-- 상단 -->
 
     <div class="top-card">
 
@@ -779,6 +782,7 @@ button:disabled {
 
             <div class="brand">
                 <h1>루다의 캘린더</h1>
+
                 <p id="description">
                     일정을 확인할 수 있습니다.
                 </p>
@@ -817,9 +821,7 @@ button:disabled {
     </div>
 
 
-    <!-- =========================
-         오류
-    ========================== -->
+    <!-- 오류 -->
 
     <div
         class="error-message"
@@ -827,9 +829,7 @@ button:disabled {
     ></div>
 
 
-    <!-- =========================
-         안내
-    ========================== -->
+    <!-- 안내 -->
 
     <div class="info-bar">
 
@@ -856,9 +856,7 @@ button:disabled {
     </div>
 
 
-    <!-- =========================
-         캘린더
-    ========================== -->
+    <!-- 캘린더 -->
 
     <div class="calendar-card">
 
@@ -871,6 +869,7 @@ button:disabled {
                 </div>
 
                 <div>
+
                     <div
                         class="month-title"
                         id="monthTitle"
@@ -879,6 +878,7 @@ button:disabled {
                     <div class="month-sub">
                         Luda Calendar
                     </div>
+
                 </div>
 
             </div>
@@ -904,15 +904,17 @@ button:disabled {
         </div>
 
 
+        <!-- 월요일 시작 -->
+
         <div class="weekdays">
 
-            <div class="weekday">일</div>
             <div class="weekday">월</div>
             <div class="weekday">화</div>
             <div class="weekday">수</div>
             <div class="weekday">목</div>
             <div class="weekday">금</div>
             <div class="weekday">토</div>
+            <div class="weekday">일</div>
 
         </div>
 
@@ -933,9 +935,7 @@ button:disabled {
 </div>
 
 
-<!-- =========================
-     로그인 모달
-========================== -->
+<!-- 로그인 모달 -->
 
 <div
     class="modal-overlay"
@@ -1015,9 +1015,7 @@ button:disabled {
 </div>
 
 
-<!-- =========================
-     일정 모달
-========================== -->
+<!-- 일정 모달 -->
 
 <div
     class="modal-overlay"
@@ -1081,8 +1079,6 @@ button:disabled {
             </label>
 
             <select id="colorInput">
-
-                <!-- 기본값: 색상 없음 -->
 
                 <option value="">
                     색상 없음
@@ -1540,6 +1536,7 @@ async function loadEvents() {
 
 /* =========================================================
    캘린더 렌더링
+   ★ 월요일 시작
 ========================================================= */
 
 function renderCalendar() {
@@ -1573,12 +1570,30 @@ function renderCalendar() {
 
     grid.innerHTML = "";
 
+    /*
+       JavaScript getDay():
+
+       일요일 = 0
+       월요일 = 1
+       화요일 = 2
+       ...
+       토요일 = 6
+
+       우리는 월요일을 첫 번째 칸으로 사용하므로
+       월요일 = 0
+       화요일 = 1
+       ...
+       일요일 = 6
+    */
+
     const firstDay =
-        new Date(
-            year,
-            month,
-            1
-        ).getDay();
+        (
+            new Date(
+                year,
+                month,
+                1
+            ).getDay() + 6
+        ) % 7;
 
     const lastDate =
         new Date(
@@ -1797,11 +1812,6 @@ function renderCalendar() {
                 }
 
 
-                /*
-                   일정이 있는 날짜를 클릭하면
-                   첫 번째 일정 수정.
-                */
-
                 if (
                     dayEvents.length > 0
                 ) {
@@ -1883,10 +1893,7 @@ function openAddModal(dateString) {
     $("titleInput").value =
         "";
 
-    /*
-       ★ 새 일정의 기본값
-       색상 없음
-    */
+    /* 기본값 = 색상 없음 */
 
     $("colorInput").value =
         "";
@@ -2131,8 +2138,10 @@ async function saveEvent() {
 
 async function deleteEvent() {
 
-    if (!isAdmin ||
-        !editingEventId) {
+    if (
+        !isAdmin ||
+        !editingEventId
+    ) {
         return;
     }
 
