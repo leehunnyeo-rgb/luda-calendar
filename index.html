@@ -1516,16 +1516,16 @@ async function loadEvents() {
       error
     } =
       await supabaseClient
-        .from("events")
-        .select("*")
-        .order(
-          "date",
-          {
-            ascending: true
-          }
-        );
+.from("events")
+.select("*")
+.order("date", {
+  ascending: true
+})
+.order("sort_order", {
+  ascending: true
+});
 
-
+    
     if (error) {
       throw error;
     }
@@ -3148,23 +3148,15 @@ async function saveEvent() {
   */
 
   const rows =
-    datesToSave.map(
-      date => ({
-
-        id:
-          crypto.randomUUID(),
-
-        date:
-          date,
-
-        title:
-          title,
-
-        color:
-          color
-
-      })
-    );
+  datesToSave.map(
+    (date, index) => ({
+      id: crypto.randomUUID(),
+      date: date,
+      title: title,
+      color: color,
+      sort_order: index
+    })
+  );
 
 
   try {
