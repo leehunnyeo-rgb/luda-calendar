@@ -246,7 +246,7 @@ button:disabled {
 }
 
 /* ==============================
-   캘린더 카드
+   캘린더
 ============================== */
 
 .calendar-card {
@@ -258,8 +258,6 @@ button:disabled {
         0 18px 55px rgba(70,51,135,.10),
         0 3px 10px rgba(70,51,135,.04);
 }
-
-/* 달력 헤더 */
 
 .calendar-header {
     display: flex;
@@ -329,7 +327,6 @@ button:disabled {
 
 /* ==============================
    요일
-   월 화 수 목 금 토 일
 ============================== */
 
 .weekdays {
@@ -347,12 +344,10 @@ button:disabled {
     font-weight: 800;
 }
 
-/* 토요일 파랑 */
 .weekday:nth-child(6) {
     color: #6c8bd8;
 }
 
-/* 일요일 빨강 */
 .weekday:nth-child(7) {
     color: #ef6b83;
 }
@@ -364,6 +359,7 @@ button:disabled {
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+    user-select: none;
 }
 
 .day {
@@ -374,7 +370,9 @@ button:disabled {
     border-right: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
     background: white;
-    transition: background .15s;
+    transition:
+        background .12s,
+        box-shadow .12s;
 }
 
 .day:nth-child(7n) {
@@ -391,6 +389,24 @@ button:disabled {
 
 .day.addable:hover {
     background: #faf8ff;
+}
+
+/* 드래그 선택 */
+
+.day.drag-selectable {
+    cursor: crosshair;
+}
+
+.day.drag-selected {
+    background: #e9e2ff !important;
+    box-shadow:
+        inset 0 0 0 2px rgba(124,92,255,.25);
+}
+
+.day.drag-anchor {
+    background: #ddd2ff !important;
+    box-shadow:
+        inset 0 0 0 2px rgba(124,92,255,.45);
 }
 
 .day-number {
@@ -455,8 +471,6 @@ button:disabled {
     filter: brightness(.97);
 }
 
-/* 색상 */
-
 .event-gray {
     background: #e2e0e6;
     color: #5e5965;
@@ -513,8 +527,6 @@ button:disabled {
     font-size: 13px;
     line-height: 1.5;
 }
-
-/* 색상 없음은 전체 칠하지 않음 */
 
 .day.single-event.no-color-event {
     padding: 9px;
@@ -589,6 +601,7 @@ button:disabled {
         opacity: 0;
         transform: translateY(8px) scale(.98);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -647,6 +660,17 @@ button:disabled {
     border-color: #a896e9;
     background: white;
     box-shadow: 0 0 0 4px rgba(124,92,255,.08);
+}
+
+.date-range-info {
+    margin-top: -7px;
+    margin-bottom: 15px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #f7f4ff;
+    color: #6d5bc0;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .modal-buttons {
@@ -774,8 +798,6 @@ button:disabled {
 
 <div class="container">
 
-    <!-- 상단 -->
-
     <div class="top-card">
 
         <div class="top-content">
@@ -821,15 +843,11 @@ button:disabled {
     </div>
 
 
-    <!-- 오류 -->
-
     <div
         class="error-message"
         id="errorMessage"
     ></div>
 
-
-    <!-- 안내 -->
 
     <div class="info-bar">
 
@@ -855,8 +873,6 @@ button:disabled {
 
     </div>
 
-
-    <!-- 캘린더 -->
 
     <div class="calendar-card">
 
@@ -904,8 +920,6 @@ button:disabled {
         </div>
 
 
-        <!-- 월요일 시작 -->
-
         <div class="weekdays">
 
             <div class="weekday">월</div>
@@ -935,7 +949,9 @@ button:disabled {
 </div>
 
 
-<!-- 로그인 모달 -->
+<!-- ==============================
+     로그인
+============================== -->
 
 <div
     class="modal-overlay"
@@ -1015,7 +1031,9 @@ button:disabled {
 </div>
 
 
-<!-- 일정 모달 -->
+<!-- ==============================
+     일정
+============================== -->
 
 <div
     class="modal-overlay"
@@ -1039,6 +1057,13 @@ button:disabled {
             </button>
 
         </div>
+
+
+        <div
+            class="date-range-info"
+            id="dateRangeInfo"
+            style="display:none;"
+        ></div>
 
 
         <div class="form-group">
@@ -1172,6 +1197,19 @@ let currentUser = null;
 let editingEventId = null;
 
 
+/*
+   드래그 선택 상태
+*/
+
+let isDragging = false;
+
+let dragStartDate = null;
+
+let dragEndDate = null;
+
+let suppressNextClick = false;
+
+
 /* =========================================================
    DOM
 ========================================================= */
@@ -1230,12 +1268,65 @@ function formatDate(date) {
 }
 
 
+function parseDate(dateString) {
+
+    const parts =
+        dateString.split("-").map(Number);
+
+    return new Date(
+        parts[0],
+        parts[1] - 1,
+        parts[2]
+    );
+}
+
+
 function getEventsForDate(dateString) {
 
     return events.filter(
         event =>
             event.date === dateString
     );
+}
+
+
+/*
+   두 날짜 사이의 모든 날짜
+*/
+
+function getDateRange(startString, endString) {
+
+    let start =
+        parseDate(startString);
+
+    let end =
+        parseDate(endString);
+
+    if (start > end) {
+
+        const temp = start;
+
+        start = end;
+        end = temp;
+    }
+
+    const result = [];
+
+    const current =
+        new Date(start);
+
+    while (current <= end) {
+
+        result.push(
+            formatDate(current)
+        );
+
+        current.setDate(
+            current.getDate() + 1
+        );
+    }
+
+    return result;
 }
 
 
@@ -1301,7 +1392,7 @@ function updateAuthUI() {
             "inline-block";
 
         $("permissionText").textContent =
-            "관리자 모드 · 날짜를 클릭해서 일정을 추가하거나 수정할 수 있습니다.";
+            "관리자 모드 · 날짜를 클릭하거나 드래그해서 일정을 추가할 수 있습니다.";
 
         $("permissionDot").classList.add(
             "admin"
@@ -1535,8 +1626,210 @@ async function loadEvents() {
 
 
 /* =========================================================
+   드래그 선택 표시
+========================================================= */
+
+function clearDragSelection() {
+
+    document
+        .querySelectorAll(".day.drag-selected, .day.drag-anchor")
+        .forEach(
+            element => {
+
+                element.classList.remove(
+                    "drag-selected",
+                    "drag-anchor"
+                );
+            }
+        );
+}
+
+
+function updateDragSelection() {
+
+    clearDragSelection();
+
+    if (
+        !dragStartDate ||
+        !dragEndDate
+    ) {
+        return;
+    }
+
+    const selectedDates =
+        getDateRange(
+            dragStartDate,
+            dragEndDate
+        );
+
+    selectedDates.forEach(
+        dateString => {
+
+            const element =
+                document.querySelector(
+                    `.day[data-date="${dateString}"]`
+                );
+
+            if (element) {
+
+                element.classList.add(
+                    "drag-selected"
+                );
+            }
+        }
+    );
+
+    const anchor =
+        document.querySelector(
+            `.day[data-date="${dragStartDate}"]`
+        );
+
+    if (anchor) {
+
+        anchor.classList.remove(
+            "drag-selected"
+        );
+
+        anchor.classList.add(
+            "drag-anchor"
+        );
+    }
+}
+
+
+/* =========================================================
+   드래그 시작
+========================================================= */
+
+function startDrag(dateString, event) {
+
+    if (!isAdmin) {
+        return;
+    }
+
+    /*
+       일정이 있는 날짜에서 시작하면
+       드래그가 아니라 기존 일정 수정으로 사용.
+    */
+
+    const dayEvents =
+        getEventsForDate(dateString);
+
+    if (
+        dayEvents.length > 0
+    ) {
+        return;
+    }
+
+    isDragging = true;
+
+    dragStartDate =
+        dateString;
+
+    dragEndDate =
+        dateString;
+
+    suppressNextClick = false;
+
+    clearDragSelection();
+
+    updateDragSelection();
+
+    /*
+       브라우저 기본 드래그 방지
+    */
+
+    if (event) {
+        event.preventDefault();
+    }
+}
+
+
+/* =========================================================
+   드래그 중
+========================================================= */
+
+function moveDrag(dateString) {
+
+    if (
+        !isDragging ||
+        !isAdmin
+    ) {
+        return;
+    }
+
+    if (
+        dragEndDate ===
+        dateString
+    ) {
+        return;
+    }
+
+    dragEndDate =
+        dateString;
+
+    updateDragSelection();
+}
+
+
+/* =========================================================
+   드래그 종료
+========================================================= */
+
+function finishDrag() {
+
+    if (!isDragging) {
+        return;
+    }
+
+    isDragging = false;
+
+    const start =
+        dragStartDate;
+
+    const end =
+        dragEndDate;
+
+    const selectedDates =
+        getDateRange(
+            start,
+            end
+        );
+
+    clearDragSelection();
+
+    dragStartDate = null;
+
+    dragEndDate = null;
+
+    /*
+       하루 클릭이면 일반 추가 모달.
+       여러 날이면 여러 날짜 등록 모달.
+    */
+
+    if (
+        selectedDates.length > 1
+    ) {
+
+        suppressNextClick = true;
+
+        openMultiAddModal(
+            selectedDates
+        );
+
+    } else {
+
+        suppressNextClick = true;
+
+        openAddModal(
+            selectedDates[0]
+        );
+    }
+}
+
+
+/* =========================================================
    캘린더 렌더링
-   ★ 월요일 시작
 ========================================================= */
 
 function renderCalendar() {
@@ -1571,19 +1864,12 @@ function renderCalendar() {
     grid.innerHTML = "";
 
     /*
-       JavaScript getDay():
-
-       일요일 = 0
-       월요일 = 1
-       화요일 = 2
+       월요일 시작
+       일=0 → 6
+       월=1 → 0
+       화=2 → 1
        ...
-       토요일 = 6
-
-       우리는 월요일을 첫 번째 칸으로 사용하므로
-       월요일 = 0
-       화요일 = 1
-       ...
-       일요일 = 6
+       토=6 → 5
     */
 
     const firstDay =
@@ -1658,6 +1944,9 @@ function renderCalendar() {
         dayEl.className =
             "day";
 
+        dayEl.dataset.date =
+            dateString;
+
 
         /* 오늘 */
 
@@ -1665,6 +1954,7 @@ function renderCalendar() {
             dateString ===
             todayString
         ) {
+
             dayEl.classList.add(
                 "today"
             );
@@ -1676,6 +1966,7 @@ function renderCalendar() {
         if (
             date.getDay() === 0
         ) {
+
             dayEl.classList.add(
                 "sunday"
             );
@@ -1684,6 +1975,7 @@ function renderCalendar() {
         if (
             date.getDay() === 6
         ) {
+
             dayEl.classList.add(
                 "saturday"
             );
@@ -1693,7 +1985,8 @@ function renderCalendar() {
         if (isAdmin) {
 
             dayEl.classList.add(
-                "addable"
+                "addable",
+                "drag-selectable"
             );
         }
 
@@ -1714,7 +2007,7 @@ function renderCalendar() {
         );
 
 
-        /* 일정 영역 */
+        /* 일정 */
 
         const eventsEl =
             document.createElement("div");
@@ -1723,7 +2016,7 @@ function renderCalendar() {
             "events";
 
 
-        /* 일정이 하나인 경우 */
+        /* 일정 하나 */
 
         if (
             dayEvents.length === 1
@@ -1746,8 +2039,6 @@ function renderCalendar() {
             }
         }
 
-
-        /* 일정 */
 
         dayEvents.forEach(
             event => {
@@ -1781,6 +2072,21 @@ function renderCalendar() {
 
                             e.stopPropagation();
 
+                            /*
+                               드래그 후 발생하는
+                               가짜 클릭 방지
+                            */
+
+                            if (
+                                suppressNextClick
+                            ) {
+
+                                suppressNextClick =
+                                    false;
+
+                                return;
+                            }
+
                             openEditModal(
                                 event
                             );
@@ -1801,13 +2107,76 @@ function renderCalendar() {
         );
 
 
-        /* 날짜 클릭 */
+        /* ==============================
+           마우스 드래그
+        ============================== */
+
+        if (isAdmin) {
+
+            dayEl.addEventListener(
+                "pointerdown",
+                function(event) {
+
+                    /*
+                       기존 일정이 있는 날짜는
+                       일정 수정용으로 남겨둠.
+                    */
+
+                    if (
+                        dayEvents.length > 0
+                    ) {
+                        return;
+                    }
+
+                    startDrag(
+                        dateString,
+                        event
+                    );
+                }
+            );
+
+
+            dayEl.addEventListener(
+                "pointerenter",
+                function() {
+
+                    if (
+                        isDragging
+                    ) {
+
+                        moveDrag(
+                            dateString
+                        );
+                    }
+                }
+            );
+        }
+
+
+        /* ==============================
+           일반 클릭
+        ============================== */
 
         dayEl.addEventListener(
             "click",
             function() {
 
                 if (!isAdmin) {
+                    return;
+                }
+
+                /*
+                   드래그 후 발생하는
+                   가짜 클릭 방지
+                */
+
+                if (
+                    suppressNextClick
+                ) {
+
+                    suppressNextClick =
+                        false;
+
                     return;
                 }
 
@@ -1838,10 +2207,38 @@ function renderCalendar() {
 
 
 /* =========================================================
+   전역 포인터 업
+========================================================= */
+
+document.addEventListener(
+    "pointerup",
+    function() {
+
+        if (isDragging) {
+
+            finishDrag();
+        }
+    }
+);
+
+
+/* =========================================================
    월 이동
 ========================================================= */
 
 function changeMonth(amount) {
+
+    /*
+       드래그 중이면 종료
+    */
+
+    isDragging = false;
+
+    clearDragSelection();
+
+    dragStartDate = null;
+
+    dragEndDate = null;
 
     currentDate =
         new Date(
@@ -1855,6 +2252,14 @@ function changeMonth(amount) {
 
 
 function goToday() {
+
+    isDragging = false;
+
+    clearDragSelection();
+
+    dragStartDate = null;
+
+    dragEndDate = null;
 
     const now =
         new Date();
@@ -1890,13 +2295,17 @@ function openAddModal(dateString) {
     $("dateInput").value =
         dateString;
 
+    $("dateInput").disabled =
+        false;
+
     $("titleInput").value =
         "";
 
-    /* 기본값 = 색상 없음 */
-
     $("colorInput").value =
         "";
+
+    $("dateRangeInfo").style.display =
+        "none";
 
     $("deleteButton").style.display =
         "none";
@@ -1907,6 +2316,94 @@ function openAddModal(dateString) {
     $("eventModal").classList.add(
         "show"
     );
+
+    setTimeout(
+        () =>
+            $("titleInput").focus(),
+        100
+    );
+}
+
+
+/* =========================================================
+   여러 날짜 일정 추가
+========================================================= */
+
+let multiSelectedDates = [];
+
+
+function openMultiAddModal(
+    selectedDates
+) {
+
+    if (!isAdmin) {
+        return;
+    }
+
+    clearError();
+
+    editingEventId = null;
+
+    multiSelectedDates =
+        selectedDates.slice();
+
+
+    $("eventModalTitle").textContent =
+        "여러 날짜에 일정 추가";
+
+
+    /*
+       첫 번째 날짜를 기본값으로 표시
+    */
+
+    $("dateInput").value =
+        selectedDates[0];
+
+    /*
+       여러 날짜 모드에서는
+       날짜 입력을 수정하지 못하게 함.
+    */
+
+    $("dateInput").disabled =
+        true;
+
+
+    $("titleInput").value =
+        "";
+
+    $("colorInput").value =
+        "";
+
+
+    const first =
+        selectedDates[0];
+
+    const last =
+        selectedDates[
+            selectedDates.length - 1
+        ];
+
+
+    $("dateRangeInfo").textContent =
+        `${first} ~ ${last} · ${selectedDates.length}일 선택됨`;
+
+
+    $("dateRangeInfo").style.display =
+        "block";
+
+
+    $("deleteButton").style.display =
+        "none";
+
+
+    $("saveButton").textContent =
+        `${selectedDates.length}일에 저장`;
+
+
+    $("eventModal").classList.add(
+        "show"
+    );
+
 
     setTimeout(
         () =>
@@ -1931,17 +2428,30 @@ function openEditModal(event) {
     editingEventId =
         event.id;
 
+    /*
+       수정 모드에서는
+       여러 날짜 선택 상태 초기화
+    */
+
+    multiSelectedDates = [];
+
     $("eventModalTitle").textContent =
         "일정 수정";
 
     $("dateInput").value =
         event.date;
 
+    $("dateInput").disabled =
+        false;
+
     $("titleInput").value =
         event.title;
 
     $("colorInput").value =
         event.color || "";
+
+    $("dateRangeInfo").style.display =
+        "none";
 
     $("deleteButton").style.display =
         "block";
@@ -1977,6 +2487,14 @@ function closeEventModal() {
     );
 
     editingEventId = null;
+
+    multiSelectedDates = [];
+
+    $("dateInput").disabled =
+        false;
+
+    $("dateRangeInfo").style.display =
+        "none";
 }
 
 
@@ -2039,14 +2557,15 @@ async function saveEvent() {
 
     try {
 
-        let result;
-
-
-        /* 수정 */
+        /*
+           ========================================
+           수정
+           ========================================
+        */
 
         if (editingEventId) {
 
-            result =
+            const result =
                 await supabaseClient
                     .from("events")
                     .update({
@@ -2062,32 +2581,10 @@ async function saveEvent() {
                     .single();
 
 
-        /* 추가 */
+            if (result.error) {
+                throw result.error;
+            }
 
-        } else {
-
-            result =
-                await supabaseClient
-                    .from("events")
-                    .insert({
-                        id: crypto.randomUUID(),
-                        date: date,
-                        title: title,
-                        color: color
-                    })
-                    .select()
-                    .single();
-        }
-
-
-        if (result.error) {
-            throw result.error;
-        }
-
-
-        /* 화면 데이터 업데이트 */
-
-        if (editingEventId) {
 
             const index =
                 events.findIndex(
@@ -2096,18 +2593,104 @@ async function saveEvent() {
                         editingEventId
                 );
 
+
             if (index !== -1) {
 
                 events[index] =
                     result.data;
             }
 
-        } else {
 
-            events.push(
-                result.data
-            );
+            closeEventModal();
+
+            renderCalendar();
+
+            return;
         }
+
+
+        /*
+           ========================================
+           여러 날짜 추가
+           ========================================
+        */
+
+        if (
+            multiSelectedDates.length > 1
+        ) {
+
+            const rows =
+                multiSelectedDates.map(
+                    selectedDate => ({
+                        id:
+                            crypto.randomUUID(),
+                        date:
+                            selectedDate,
+                        title:
+                            title,
+                        color:
+                            color
+                    })
+                );
+
+
+            const result =
+                await supabaseClient
+                    .from("events")
+                    .insert(rows)
+                    .select();
+
+
+            if (result.error) {
+                throw result.error;
+            }
+
+
+            events =
+                events.concat(
+                    result.data || []
+                );
+
+
+            closeEventModal();
+
+            renderCalendar();
+
+            return;
+        }
+
+
+        /*
+           ========================================
+           일반 하루 추가
+           ========================================
+        */
+
+        const result =
+            await supabaseClient
+                .from("events")
+                .insert({
+                    id:
+                        crypto.randomUUID(),
+                    date:
+                        date,
+                    title:
+                        title,
+                    color:
+                        color
+                })
+                .select()
+                .single();
+
+
+        if (result.error) {
+            throw result.error;
+        }
+
+
+        events.push(
+            result.data
+        );
 
 
         closeEventModal();
@@ -2125,6 +2708,11 @@ async function saveEvent() {
     } finally {
 
         button.disabled = false;
+
+        /*
+           여러 날짜 모드가 끝나면
+           다시 일반 저장 버튼
+        */
 
         button.textContent =
             "저장";
@@ -2283,6 +2871,14 @@ document.addEventListener(
         closeLoginModal();
 
         closeEventModal();
+
+        isDragging = false;
+
+        clearDragSelection();
+
+        dragStartDate = null;
+
+        dragEndDate = null;
     }
 );
 
