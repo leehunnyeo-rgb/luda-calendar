@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>루다의 캘린더</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,10 +12,29 @@
     box-sizing: border-box;
 }
 
+:root {
+    --purple: #7c5cff;
+    --purple-dark: #6046d9;
+    --purple-light: #eee9ff;
+    --purple-soft: #f7f4ff;
+    --text: #302b3d;
+    --muted: #8d879b;
+    --line: #eeeaf5;
+    --white: #ffffff;
+}
+
+html,
 body {
     margin: 0;
-    background: #f5f5f7;
-    color: #333;
+    min-height: 100%;
+}
+
+body {
+    background:
+        radial-gradient(circle at 10% 0%, rgba(150,125,255,.20), transparent 32%),
+        radial-gradient(circle at 100% 10%, rgba(220,190,255,.22), transparent 30%),
+        linear-gradient(135deg, #f8f6ff 0%, #f2efff 45%, #faf9ff 100%);
+    color: var(--text);
     font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -35,165 +53,323 @@ button {
     cursor: pointer;
 }
 
-/* =========================
-   전체
-========================= */
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px;
+button:disabled {
+    cursor: not-allowed;
+    opacity: .6;
 }
 
-/* =========================
-   헤더
-========================= */
+/* ==============================
+   전체
+============================== */
 
-.header {
+.container {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 34px 0 50px;
+}
+
+/* ==============================
+   상단
+============================== */
+
+.top-card {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 22px;
+    padding: 28px 30px;
+    border-radius: 28px;
+    background:
+        linear-gradient(135deg, #7154ed 0%, #9279ff 48%, #b59dff 100%);
+    color: white;
+    box-shadow:
+        0 18px 45px rgba(103, 75, 205, .22);
+}
+
+.top-card::before {
+    content: "";
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    right: -80px;
+    top: -130px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.12);
+}
+
+.top-card::after {
+    content: "";
+    position: absolute;
+    width: 170px;
+    height: 170px;
+    right: 130px;
+    bottom: -120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+}
+
+.top-content {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 20px;
+    gap: 20px;
 }
 
-.title-area h1 {
+.brand h1 {
     margin: 0;
-    font-size: 28px;
-    font-weight: 800;
+    font-size: 31px;
+    font-weight: 850;
+    letter-spacing: -1.2px;
 }
 
-.title-area p {
-    margin: 6px 0 0;
-    color: #888;
+.brand p {
+    margin: 7px 0 0;
     font-size: 14px;
+    color: rgba(255,255,255,.82);
 }
 
 .auth-area {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
 }
 
 .auth-status {
     font-size: 13px;
-    color: #777;
+    color: rgba(255,255,255,.86);
 }
 
 .btn {
     border: 0;
-    border-radius: 10px;
-    padding: 9px 14px;
-    font-weight: 700;
-    transition: 0.15s;
+    border-radius: 12px;
+    padding: 10px 15px;
+    font-weight: 750;
+    transition:
+        transform .15s,
+        box-shadow .15s,
+        background .15s;
 }
 
 .btn:hover {
     transform: translateY(-1px);
 }
 
-.btn-primary {
-    background: #333;
-    color: white;
+.btn-white {
+    background: white;
+    color: #654bdd;
+    box-shadow: 0 5px 16px rgba(60,40,130,.12);
 }
 
-.btn-secondary {
-    background: #e8e8eb;
-    color: #333;
+.btn-white:hover {
+    background: #faf9ff;
+}
+
+.btn-light {
+    background: #f0ecff;
+    color: #684fe0;
+}
+
+.btn-purple {
+    background: linear-gradient(135deg, #7657ed, #9275ff);
+    color: white;
+    box-shadow: 0 7px 18px rgba(112,82,226,.24);
 }
 
 .btn-danger {
-    background: #e74c3c;
-    color: white;
+    background: #ffe8ed;
+    color: #d63e5b;
 }
 
 .btn-small {
-    padding: 7px 11px;
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+/* ==============================
+   안내
+============================== */
+
+.info-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 13px 17px;
+    border: 1px solid rgba(124,92,255,.08);
+    border-radius: 15px;
+    background: rgba(255,255,255,.78);
+    box-shadow: 0 5px 20px rgba(83,63,145,.05);
+    backdrop-filter: blur(10px);
+}
+
+.permission {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--muted);
     font-size: 13px;
 }
 
-/* =========================
-   캘린더
-========================= */
+.permission-dot {
+    width: 8px;
+    height: 8px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: #b9b3c8;
+}
+
+.permission-dot.admin {
+    background: #7c5cff;
+    box-shadow: 0 0 0 4px rgba(124,92,255,.12);
+}
+
+/* ==============================
+   에러
+============================== */
+
+.error-message {
+    display: none;
+    margin-bottom: 14px;
+    padding: 13px 16px;
+    border: 1px solid #ffd0d8;
+    border-radius: 13px;
+    background: #fff1f3;
+    color: #b72f48;
+    font-size: 13px;
+    white-space: pre-wrap;
+}
+
+.error-message.show {
+    display: block;
+}
+
+/* ==============================
+   캘린더 카드
+============================== */
 
 .calendar-card {
-    background: white;
-    border-radius: 18px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
     overflow: hidden;
+    border: 1px solid rgba(110,84,200,.08);
+    border-radius: 25px;
+    background: rgba(255,255,255,.94);
+    box-shadow:
+        0 18px 55px rgba(70,51,135,.10),
+        0 3px 10px rgba(70,51,135,.04);
 }
+
+/* 달력 헤더 */
 
 .calendar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 20px;
-    border-bottom: 1px solid #eee;
+    padding: 21px 24px;
+    background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #fbfaff 100%
+    );
+    border-bottom: 1px solid var(--line);
+}
+
+.month-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.calendar-icon {
+    width: 43px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: var(--purple-light);
+    color: var(--purple);
+    font-size: 21px;
 }
 
 .month-title {
-    font-size: 22px;
-    font-weight: 800;
+    font-size: 23px;
+    font-weight: 850;
+    letter-spacing: -0.7px;
+}
+
+.month-sub {
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 11px;
 }
 
 .month-controls {
     display: flex;
-    gap: 6px;
+    gap: 7px;
 }
 
 .month-btn {
     width: 38px;
     height: 38px;
-    border: 0;
-    border-radius: 9px;
-    background: #f0f0f2;
-    font-size: 18px;
+    border: 1px solid #e9e4f3;
+    border-radius: 11px;
+    background: white;
+    color: #766d85;
+    font-size: 21px;
+    line-height: 1;
+    transition: .15s;
 }
 
 .month-btn:hover {
-    background: #e3e3e6;
+    border-color: #cfc4ef;
+    background: #f7f4ff;
+    color: var(--purple);
 }
+
+/* 요일 */
 
 .weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    background: #fafafa;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--line);
+    background: #faf9fd;
 }
 
 .weekday {
-    padding: 11px 5px;
+    padding: 12px 5px;
     text-align: center;
-    font-weight: 700;
-    font-size: 13px;
-    color: #777;
+    color: #8b8498;
+    font-size: 12px;
+    font-weight: 800;
 }
 
 .weekday:first-child {
-    color: #e74c3c;
+    color: #ef6b83;
 }
 
 .weekday:last-child {
-    color: #4a78d0;
+    color: #6c8bd8;
 }
+
+/* ==============================
+   날짜
+============================== */
 
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
 }
 
-/* =========================
-   날짜 칸
-========================= */
-
 .day {
     position: relative;
-    min-height: 135px;
-    border-right: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-    background: white;
-    padding: 8px;
+    min-height: 142px;
+    padding: 9px;
     overflow: hidden;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: white;
+    transition: background .15s;
 }
 
 .day:nth-child(7n) {
@@ -201,33 +377,7 @@ button {
 }
 
 .day.empty {
-    background: #fafafa;
-}
-
-.day-number {
-    position: relative;
-    z-index: 3;
-    width: 27px;
-    height: 27px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.day.today .day-number {
-    background: #333;
-    color: white;
-}
-
-.day.sunday .day-number {
-    color: #e74c3c;
-}
-
-.day.saturday .day-number {
-    color: #4a78d0;
+    background: #fcfbfe;
 }
 
 .day.addable {
@@ -235,16 +385,44 @@ button {
 }
 
 .day.addable:hover {
-    background: #fafafa;
+    background: #faf8ff;
 }
 
-/* =========================
+.day-number {
+    position: relative;
+    z-index: 10;
+    width: 27px;
+    height: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #5f586b;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.day.sunday .day-number {
+    color: #ec6a81;
+}
+
+.day.saturday .day-number {
+    color: #6686d5;
+}
+
+.day.today .day-number {
+    background: linear-gradient(135deg, #7556ed, #967aff);
+    color: white;
+    box-shadow: 0 4px 10px rgba(117,86,237,.27);
+}
+
+/* ==============================
    일정
-========================= */
+============================== */
 
 .events {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -253,47 +431,50 @@ button {
 
 .event {
     position: relative;
-    min-height: 27px;
-    padding: 5px 7px;
-    border-radius: 6px;
-    background: #f1f1f1;
-    color: #444;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.3;
+    min-height: 28px;
+    padding: 6px 8px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f2f0f5;
+    color: #5e5869;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.35;
     word-break: break-word;
     cursor: pointer;
+    transition: transform .12s, filter .12s;
 }
 
 .event:hover {
-    filter: brightness(0.96);
+    transform: translateY(-1px);
+    filter: brightness(.97);
 }
 
 /* 색상 */
 
 .event-gray {
-    background: #dcdcdc;
-    color: #444;
+    background: #e2e0e6;
+    color: #5e5965;
 }
 
 .event-green {
-    background: #bfe8c6;
-    color: #245b2e;
+    background: #c9edcf;
+    color: #286037;
 }
 
 .event-yellow {
-    background: #ffe89a;
-    color: #675500;
+    background: #ffe9a1;
+    color: #6b5900;
 }
 
 .event-purple {
-    background: #d9c4f2;
-    color: #503276;
+    background: #d9ccff;
+    color: #5940a2;
 }
 
-/* =========================
-   일정 하나일 때 날짜 전체
-========================= */
+/* ==============================
+   일정 하나 = 날짜 전체 색상
+============================== */
 
 .day.single-event {
     padding: 0;
@@ -301,37 +482,37 @@ button {
 
 .day.single-event .day-number {
     position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 4;
+    top: 9px;
+    left: 9px;
+    z-index: 20;
 }
 
 .day.single-event .events {
     position: absolute;
     inset: 0;
     margin: 0;
-    z-index: 1;
+    z-index: 2;
 }
 
 .day.single-event .event {
     width: 100%;
     height: 100%;
     min-height: 100%;
+    margin: 0;
+    padding: 43px 13px 12px;
     border-radius: 0;
-    padding: 42px 12px 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    font-size: 14px;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
-/*
-   색상 없음인 경우에는 날짜 전체를 칠하지 않고
-   일반 일정 형태로 표시
-*/
+/* 색상 없음은 전체 칠하지 않음 */
+
 .day.single-event.no-color-event {
-    padding: 8px;
+    padding: 9px;
 }
 
 .day.single-event.no-color-event .day-number {
@@ -348,25 +529,38 @@ button {
 
 .day.single-event.no-color-event .event {
     height: auto;
-    min-height: 27px;
-    border-radius: 6px;
-    padding: 7px;
+    min-height: 28px;
+    padding: 6px 8px;
+    border-radius: 8px;
     display: block;
+    text-align: left;
 }
 
-/* =========================
-   로그인/모달
-========================= */
+/* ==============================
+   로딩
+============================== */
+
+.loading {
+    grid-column: 1 / -1;
+    padding: 70px 20px;
+    text-align: center;
+    color: #aaa3b4;
+}
+
+/* ==============================
+   모달
+============================== */
 
 .modal-overlay {
     position: fixed;
     inset: 0;
     z-index: 1000;
-    background: rgba(0,0,0,0.45);
     display: none;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    background: rgba(42,32,70,.42);
+    backdrop-filter: blur(5px);
 }
 
 .modal-overlay.show {
@@ -376,15 +570,47 @@ button {
 .modal {
     width: 100%;
     max-width: 430px;
+    padding: 25px;
+    border: 1px solid rgba(124,92,255,.12);
+    border-radius: 22px;
     background: white;
-    border-radius: 18px;
-    padding: 24px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    box-shadow:
+        0 25px 80px rgba(40,25,90,.22);
+    animation: modalIn .18s ease-out;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
 .modal h2 {
-    margin: 0 0 20px;
+    margin: 0;
     font-size: 21px;
+    font-weight: 850;
+}
+
+.modal-close {
+    width: 33px;
+    height: 33px;
+    border: 0;
+    border-radius: 9px;
+    background: #f4f1fa;
+    color: #82798e;
+    font-size: 20px;
 }
 
 .form-group {
@@ -394,130 +620,125 @@ button {
 .form-group label {
     display: block;
     margin-bottom: 7px;
-    font-size: 13px;
-    font-weight: 700;
-    color: #555;
+    color: #655e70;
+    font-size: 12px;
+    font-weight: 800;
 }
 
 .form-group input,
 .form-group select {
     width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 9px;
-    padding: 11px 12px;
+    padding: 12px 13px;
     outline: none;
-    background: white;
+    border: 1px solid #e4dfeb;
+    border-radius: 11px;
+    background: #fcfbfe;
+    color: #3f3949;
+    transition: .15s;
 }
 
 .form-group input:focus,
 .form-group select:focus {
-    border-color: #888;
+    border-color: #a896e9;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(124,92,255,.08);
 }
 
 .modal-buttons {
     display: flex;
     gap: 8px;
-    margin-top: 20px;
+    margin-top: 21px;
 }
 
 .modal-buttons button {
     flex: 1;
 }
 
-.modal-close {
-    float: right;
-    border: 0;
-    background: none;
-    font-size: 22px;
-    color: #888;
-}
+/* ==============================
+   반응형
+============================== */
 
-/* =========================
-   상태 / 안내
-========================= */
+@media (max-width: 760px) {
 
-.info-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin: 14px 0;
-    padding: 11px 14px;
-    border-radius: 10px;
-    background: #fff;
-    color: #777;
-    font-size: 13px;
-}
-
-.error-message {
-    display: none;
-    margin-bottom: 12px;
-    padding: 12px 14px;
-    border-radius: 10px;
-    background: #ffe3e0;
-    color: #b42318;
-    font-size: 13px;
-    white-space: pre-wrap;
-}
-
-.error-message.show {
-    display: block;
-}
-
-.loading {
-    padding: 50px;
-    text-align: center;
-    color: #999;
-}
-
-/* =========================
-   모바일
-========================= */
-
-@media (max-width: 700px) {
     .container {
-        padding: 10px;
+        width: calc(100% - 16px);
+        padding-top: 12px;
     }
 
-    .header {
+    .top-card {
+        padding: 21px 18px;
+        border-radius: 22px;
+    }
+
+    .top-content {
         align-items: flex-start;
     }
 
-    .title-area h1 {
-        font-size: 22px;
+    .brand h1 {
+        font-size: 24px;
+    }
+
+    .brand p {
+        font-size: 12px;
     }
 
     .auth-status {
         display: none;
     }
 
+    .calendar-card {
+        border-radius: 18px;
+    }
+
     .calendar-header {
-        padding: 13px;
+        padding: 14px;
+    }
+
+    .calendar-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 17px;
     }
 
     .month-title {
         font-size: 18px;
     }
 
+    .month-sub {
+        display: none;
+    }
+
+    .month-btn {
+        width: 34px;
+        height: 34px;
+    }
+
     .day {
-        min-height: 90px;
+        min-height: 94px;
         padding: 5px;
     }
 
     .day-number {
         width: 23px;
         height: 23px;
-        font-size: 11px;
+        font-size: 10px;
     }
 
     .event {
-        font-size: 10px;
-        padding: 4px;
+        min-height: 24px;
+        padding: 4px 5px;
+        border-radius: 6px;
+        font-size: 9px;
+    }
+
+    .day.single-event .day-number {
+        top: 6px;
+        left: 6px;
     }
 
     .day.single-event .event {
-        padding: 35px 5px 5px;
-        font-size: 11px;
+        padding: 34px 5px 5px;
+        font-size: 10px;
     }
 
     .day.single-event.no-color-event {
@@ -525,12 +746,20 @@ button {
     }
 
     .day.single-event.no-color-event .event {
-        padding: 5px;
+        padding: 4px 5px;
     }
 
     .weekday {
+        padding: 9px 2px;
+        font-size: 10px;
+    }
+
+    .info-bar {
+        padding: 10px 12px;
+    }
+
+    .permission {
         font-size: 11px;
-        padding: 8px 2px;
     }
 }
 </style>
@@ -540,78 +769,143 @@ button {
 
 <div class="container">
 
-    <div class="header">
-        <div class="title-area">
-            <h1>루다의 캘린더</h1>
-            <p id="description">
-                일정을 확인할 수 있습니다.
-            </p>
+    <!-- =========================
+         상단
+    ========================== -->
+
+    <div class="top-card">
+
+        <div class="top-content">
+
+            <div class="brand">
+                <h1>루다의 캘린더</h1>
+                <p id="description">
+                    일정을 확인할 수 있습니다.
+                </p>
+            </div>
+
+            <div class="auth-area">
+
+                <span
+                    class="auth-status"
+                    id="authStatus"
+                >
+                    확인 중...
+                </span>
+
+                <button
+                    class="btn btn-white btn-small"
+                    id="loginButton"
+                    onclick="openLoginModal()"
+                >
+                    관리자 로그인
+                </button>
+
+                <button
+                    class="btn btn-light btn-small"
+                    id="logoutButton"
+                    onclick="logout()"
+                    style="display:none;"
+                >
+                    로그아웃
+                </button>
+
+            </div>
+
         </div>
 
-        <div class="auth-area">
-            <span class="auth-status" id="authStatus">
-                로그인 확인 중...
-            </span>
-
-            <button
-                class="btn btn-primary btn-small"
-                id="loginButton"
-                onclick="openLoginModal()"
-            >
-                관리자 로그인
-            </button>
-
-            <button
-                class="btn btn-secondary btn-small"
-                id="logoutButton"
-                onclick="logout()"
-                style="display:none;"
-            >
-                로그아웃
-            </button>
-        </div>
     </div>
 
-    <div class="error-message" id="errorMessage"></div>
+
+    <!-- =========================
+         오류
+    ========================== -->
+
+    <div
+        class="error-message"
+        id="errorMessage"
+    ></div>
+
+
+    <!-- =========================
+         안내
+    ========================== -->
 
     <div class="info-bar">
-        <span id="permissionText">
-            일정을 불러오는 중...
-        </span>
+
+        <div class="permission">
+
+            <span
+                class="permission-dot"
+                id="permissionDot"
+            ></span>
+
+            <span id="permissionText">
+                일정을 불러오는 중...
+            </span>
+
+        </div>
 
         <button
-            class="btn btn-secondary btn-small"
+            class="btn btn-light btn-small"
             onclick="goToday()"
         >
             오늘
         </button>
+
     </div>
+
+
+    <!-- =========================
+         캘린더
+    ========================== -->
 
     <div class="calendar-card">
 
         <div class="calendar-header">
 
-            <button
-                class="month-btn"
-                onclick="changeMonth(-1)"
-                aria-label="이전 달"
-            >
-                ‹
-            </button>
+            <div class="month-area">
 
-            <div class="month-title" id="monthTitle"></div>
+                <div class="calendar-icon">
+                    📅
+                </div>
 
-            <button
-                class="month-btn"
-                onclick="changeMonth(1)"
-                aria-label="다음 달"
-            >
-                ›
-            </button>
+                <div>
+                    <div
+                        class="month-title"
+                        id="monthTitle"
+                    ></div>
+
+                    <div class="month-sub">
+                        Luda Calendar
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="month-controls">
+
+                <button
+                    class="month-btn"
+                    onclick="changeMonth(-1)"
+                >
+                    ‹
+                </button>
+
+                <button
+                    class="month-btn"
+                    onclick="changeMonth(1)"
+                >
+                    ›
+                </button>
+
+            </div>
 
         </div>
 
+
         <div class="weekdays">
+
             <div class="weekday">일</div>
             <div class="weekday">월</div>
             <div class="weekday">화</div>
@@ -619,15 +913,19 @@ button {
             <div class="weekday">목</div>
             <div class="weekday">금</div>
             <div class="weekday">토</div>
+
         </div>
+
 
         <div
             class="calendar-grid"
             id="calendarGrid"
         >
+
             <div class="loading">
                 캘린더를 불러오는 중...
             </div>
+
         </div>
 
     </div>
@@ -637,7 +935,7 @@ button {
 
 <!-- =========================
      로그인 모달
-========================= -->
+========================== -->
 
 <div
     class="modal-overlay"
@@ -647,46 +945,64 @@ button {
 
     <div class="modal">
 
-        <button
-            class="modal-close"
-            onclick="closeLoginModal()"
-        >
-            ×
-        </button>
+        <div class="modal-head">
 
-        <h2>관리자 로그인</h2>
+            <h2>관리자 로그인</h2>
+
+            <button
+                class="modal-close"
+                onclick="closeLoginModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
 
         <div class="form-group">
-            <label for="emailInput">이메일</label>
+
+            <label for="emailInput">
+                이메일
+            </label>
+
             <input
                 id="emailInput"
                 type="email"
                 autocomplete="email"
                 placeholder="관리자 이메일"
             >
+
         </div>
 
+
         <div class="form-group">
-            <label for="passwordInput">비밀번호</label>
+
+            <label for="passwordInput">
+                비밀번호
+            </label>
+
             <input
                 id="passwordInput"
                 type="password"
                 autocomplete="current-password"
                 placeholder="비밀번호"
             >
+
         </div>
+
 
         <div class="modal-buttons">
 
             <button
-                class="btn btn-secondary"
+                class="btn btn-light"
                 onclick="closeLoginModal()"
             >
                 취소
             </button>
 
             <button
-                class="btn btn-primary"
+                class="btn btn-purple"
+                id="loginSubmitButton"
                 onclick="login()"
             >
                 로그인
@@ -701,7 +1017,7 @@ button {
 
 <!-- =========================
      일정 모달
-========================= -->
+========================== -->
 
 <div
     class="modal-overlay"
@@ -711,40 +1027,63 @@ button {
 
     <div class="modal">
 
-        <button
-            class="modal-close"
-            onclick="closeEventModal()"
-        >
-            ×
-        </button>
+        <div class="modal-head">
 
-        <h2 id="eventModalTitle">일정 추가</h2>
+            <h2 id="eventModalTitle">
+                일정 추가
+            </h2>
+
+            <button
+                class="modal-close"
+                onclick="closeEventModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
 
         <div class="form-group">
-            <label for="dateInput">날짜</label>
+
+            <label for="dateInput">
+                날짜
+            </label>
+
             <input
                 id="dateInput"
                 type="date"
             >
+
         </div>
 
+
         <div class="form-group">
-            <label for="titleInput">일정</label>
+
+            <label for="titleInput">
+                일정
+            </label>
+
             <input
                 id="titleInput"
                 type="text"
                 maxlength="100"
-                placeholder="일정 내용을 입력하세요"
                 autocomplete="off"
+                placeholder="일정 내용을 입력하세요"
             >
+
         </div>
 
+
         <div class="form-group">
-            <label for="colorInput">색상</label>
+
+            <label for="colorInput">
+                색상
+            </label>
 
             <select id="colorInput">
 
-                <!-- 기본값은 색상 없음 -->
+                <!-- 기본값: 색상 없음 -->
+
                 <option value="">
                     색상 없음
                 </option>
@@ -766,12 +1105,14 @@ button {
                 </option>
 
             </select>
+
         </div>
+
 
         <div class="modal-buttons">
 
             <button
-                class="btn btn-secondary"
+                class="btn btn-light"
                 onclick="closeEventModal()"
             >
                 취소
@@ -787,7 +1128,7 @@ button {
             </button>
 
             <button
-                class="btn btn-primary"
+                class="btn btn-purple"
                 id="saveButton"
                 onclick="saveEvent()"
             >
@@ -802,8 +1143,9 @@ button {
 
 
 <script>
+
 /* =========================================================
-   Supabase 설정
+   SUPABASE
 ========================================================= */
 
 const SUPABASE_URL =
@@ -820,7 +1162,7 @@ const supabaseClient =
 
 
 /* =========================================================
-   전역 상태
+   상태
 ========================================================= */
 
 let currentDate = new Date();
@@ -835,7 +1177,7 @@ let editingEventId = null;
 
 
 /* =========================================================
-   짧은 DOM 함수
+   DOM
 ========================================================= */
 
 function $(id) {
@@ -844,19 +1186,20 @@ function $(id) {
 
 
 /* =========================================================
-   오류 표시
+   오류
 ========================================================= */
 
 function showError(message) {
-
-    console.error(message);
 
     const box = $("errorMessage");
 
     box.textContent = message;
 
     box.classList.add("show");
+
+    console.error(message);
 }
+
 
 function clearError() {
 
@@ -869,281 +1212,7 @@ function clearError() {
 
 
 /* =========================================================
-   인증 확인
-========================================================= */
-
-async function checkAuth() {
-
-    try {
-
-        const {
-            data,
-            error
-        } = await supabaseClient.auth.getSession();
-
-        if (error) {
-            throw error;
-        }
-
-        currentUser =
-            data.session
-                ? data.session.user
-                : null;
-
-        isAdmin = !!currentUser;
-
-        updateAuthUI();
-
-    } catch (error) {
-
-        isAdmin = false;
-
-        currentUser = null;
-
-        updateAuthUI();
-
-        showError(
-            "로그인 상태를 확인하는 중 오류가 발생했습니다.\n" +
-            error.message
-        );
-    }
-}
-
-
-/* =========================================================
-   로그인 상태 UI
-========================================================= */
-
-function updateAuthUI() {
-
-    if (isAdmin) {
-
-        $("authStatus").textContent =
-            "관리자 로그인됨";
-
-        $("loginButton").style.display =
-            "none";
-
-        $("logoutButton").style.display =
-            "inline-block";
-
-        $("permissionText").textContent =
-            "관리자 모드 · 날짜를 클릭하여 일정을 추가할 수 있습니다.";
-
-        $("description").textContent =
-            "관리자 로그인 상태입니다.";
-
-    } else {
-
-        $("authStatus").textContent =
-            "방문자";
-
-        $("loginButton").style.display =
-            "inline-block";
-
-        $("logoutButton").style.display =
-            "none";
-
-        $("permissionText").textContent =
-            "일정 보기만 가능합니다. 일정을 추가하려면 관리자 로그인이 필요합니다.";
-
-        $("description").textContent =
-            "일정을 확인할 수 있습니다.";
-    }
-
-    renderCalendar();
-}
-
-
-/* =========================================================
-   로그인 모달
-========================================================= */
-
-function openLoginModal() {
-
-    clearError();
-
-    $("loginModal").classList.add("show");
-
-    setTimeout(() => {
-        $("emailInput").focus();
-    }, 100);
-}
-
-
-function closeLoginModal() {
-
-    $("loginModal").classList.remove("show");
-}
-
-
-async function login() {
-
-    clearError();
-
-    const email =
-        $("emailInput").value.trim();
-
-    const password =
-        $("passwordInput").value;
-
-    if (!email || !password) {
-
-        showError(
-            "이메일과 비밀번호를 입력해주세요."
-        );
-
-        return;
-    }
-
-    const button =
-        document.querySelector(
-            "#loginModal .btn-primary"
-        );
-
-    button.disabled = true;
-
-    button.textContent =
-        "로그인 중...";
-
-    try {
-
-        const {
-            data,
-            error
-        } =
-        await supabaseClient.auth.signInWithPassword({
-            email,
-            password
-        });
-
-        if (error) {
-            throw error;
-        }
-
-        currentUser = data.user;
-
-        isAdmin = true;
-
-        updateAuthUI();
-
-        closeLoginModal();
-
-        $("passwordInput").value = "";
-
-    } catch (error) {
-
-        showError(
-            "로그인에 실패했습니다.\n" +
-            error.message
-        );
-
-    } finally {
-
-        button.disabled = false;
-
-        button.textContent =
-            "로그인";
-    }
-}
-
-
-/* =========================================================
-   로그아웃
-========================================================= */
-
-async function logout() {
-
-    clearError();
-
-    const {
-        error
-    } = await supabaseClient.auth.signOut();
-
-    if (error) {
-
-        showError(
-            "로그아웃에 실패했습니다.\n" +
-            error.message
-        );
-
-        return;
-    }
-
-    currentUser = null;
-
-    isAdmin = false;
-
-    closeEventModal();
-
-    updateAuthUI();
-}
-
-
-/* =========================================================
-   인증 상태 변경 감지
-========================================================= */
-
-supabaseClient.auth.onAuthStateChange(
-    (_event, session) => {
-
-        currentUser =
-            session
-                ? session.user
-                : null;
-
-        isAdmin = !!session;
-
-        updateAuthUI();
-    }
-);
-
-
-/* =========================================================
-   Supabase에서 일정 불러오기
-========================================================= */
-
-async function loadEvents() {
-
-    clearError();
-
-    try {
-
-        const {
-            data,
-            error
-        } =
-        await supabaseClient
-            .from("events")
-            .select("*")
-            .order("date", {
-                ascending: true
-            });
-
-        if (error) {
-            throw error;
-        }
-
-        events = data || [];
-
-        renderCalendar();
-
-    } catch (error) {
-
-        events = [];
-
-        renderCalendar();
-
-        showError(
-            "일정을 불러오지 못했습니다.\n\n" +
-            error.message
-        );
-    }
-}
-
-
-/* =========================================================
-   캘린더 날짜 계산
+   날짜
 ========================================================= */
 
 function formatDate(date) {
@@ -1171,6 +1240,301 @@ function getEventsForDate(dateString) {
         event =>
             event.date === dateString
     );
+}
+
+
+/* =========================================================
+   인증
+========================================================= */
+
+async function checkAuth() {
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+        await supabaseClient.auth.getSession();
+
+        if (error) {
+            throw error;
+        }
+
+        currentUser =
+            data.session
+                ? data.session.user
+                : null;
+
+        isAdmin =
+            !!currentUser;
+
+        updateAuthUI();
+
+    } catch (error) {
+
+        currentUser = null;
+
+        isAdmin = false;
+
+        updateAuthUI();
+
+        showError(
+            "로그인 상태를 확인하지 못했습니다.\n" +
+            error.message
+        );
+    }
+}
+
+
+/* =========================================================
+   인증 UI
+========================================================= */
+
+function updateAuthUI() {
+
+    if (isAdmin) {
+
+        $("authStatus").textContent =
+            "관리자 로그인됨";
+
+        $("loginButton").style.display =
+            "none";
+
+        $("logoutButton").style.display =
+            "inline-block";
+
+        $("permissionText").textContent =
+            "관리자 모드 · 날짜를 클릭해서 일정을 추가하거나 수정할 수 있습니다.";
+
+        $("permissionDot").classList.add(
+            "admin"
+        );
+
+        $("description").textContent =
+            "관리자 모드로 일정을 관리할 수 있습니다.";
+
+    } else {
+
+        $("authStatus").textContent =
+            "방문자";
+
+        $("loginButton").style.display =
+            "inline-block";
+
+        $("logoutButton").style.display =
+            "none";
+
+        $("permissionText").textContent =
+            "일정 보기만 가능합니다. 추가·수정·삭제는 관리자 로그인 후 가능합니다.";
+
+        $("permissionDot").classList.remove(
+            "admin"
+        );
+
+        $("description").textContent =
+            "일정을 확인할 수 있습니다.";
+    }
+
+    renderCalendar();
+}
+
+
+/* =========================================================
+   로그인
+========================================================= */
+
+function openLoginModal() {
+
+    clearError();
+
+    $("loginModal").classList.add(
+        "show"
+    );
+
+    setTimeout(
+        () =>
+            $("emailInput").focus(),
+        100
+    );
+}
+
+
+function closeLoginModal() {
+
+    $("loginModal").classList.remove(
+        "show"
+    );
+}
+
+
+async function login() {
+
+    clearError();
+
+    const email =
+        $("emailInput").value.trim();
+
+    const password =
+        $("passwordInput").value;
+
+    if (!email || !password) {
+
+        showError(
+            "이메일과 비밀번호를 입력해주세요."
+        );
+
+        return;
+    }
+
+    const button =
+        $("loginSubmitButton");
+
+    button.disabled = true;
+
+    button.textContent =
+        "로그인 중...";
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+        await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        currentUser =
+            data.user;
+
+        isAdmin = true;
+
+        updateAuthUI();
+
+        closeLoginModal();
+
+        $("passwordInput").value = "";
+
+    } catch (error) {
+
+        showError(
+            "로그인에 실패했습니다.\n\n" +
+            error.message
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+        button.textContent =
+            "로그인";
+    }
+}
+
+
+/* =========================================================
+   로그아웃
+========================================================= */
+
+async function logout() {
+
+    clearError();
+
+    const {
+        error
+    } =
+    await supabaseClient.auth.signOut();
+
+    if (error) {
+
+        showError(
+            "로그아웃에 실패했습니다.\n" +
+            error.message
+        );
+
+        return;
+    }
+
+    currentUser = null;
+
+    isAdmin = false;
+
+    closeEventModal();
+
+    updateAuthUI();
+}
+
+
+/* =========================================================
+   Auth 변화
+========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+    (_event, session) => {
+
+        currentUser =
+            session
+                ? session.user
+                : null;
+
+        isAdmin =
+            !!session;
+
+        updateAuthUI();
+    }
+);
+
+
+/* =========================================================
+   일정 불러오기
+========================================================= */
+
+async function loadEvents() {
+
+    clearError();
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+        await supabaseClient
+            .from("events")
+            .select("*")
+            .order(
+                "date",
+                {
+                    ascending: true
+                }
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        events =
+            data || [];
+
+        renderCalendar();
+
+    } catch (error) {
+
+        events = [];
+
+        renderCalendar();
+
+        showError(
+            "일정을 불러오지 못했습니다.\n\n" +
+            error.message
+        );
+    }
 }
 
 
@@ -1223,6 +1587,7 @@ function renderCalendar() {
             0
         ).getDate();
 
+
     /* 이전 달 빈칸 */
 
     for (
@@ -1237,17 +1602,19 @@ function renderCalendar() {
         empty.className =
             "day empty";
 
-        grid.appendChild(empty);
+        grid.appendChild(
+            empty
+        );
     }
 
 
-    /* 날짜 */
-
-    const today =
-        new Date();
-
     const todayString =
-        formatDate(today);
+        formatDate(
+            new Date()
+        );
+
+
+    /* 날짜 */
 
     for (
         let dayNumber = 1;
@@ -1276,26 +1643,43 @@ function renderCalendar() {
         dayEl.className =
             "day";
 
+
+        /* 오늘 */
+
         if (
-            dateString === todayString
+            dateString ===
+            todayString
         ) {
-            dayEl.classList.add("today");
+            dayEl.classList.add(
+                "today"
+            );
         }
+
+
+        /* 주말 */
 
         if (
             date.getDay() === 0
         ) {
-            dayEl.classList.add("sunday");
+            dayEl.classList.add(
+                "sunday"
+            );
         }
 
         if (
             date.getDay() === 6
         ) {
-            dayEl.classList.add("saturday");
+            dayEl.classList.add(
+                "saturday"
+            );
         }
 
+
         if (isAdmin) {
-            dayEl.classList.add("addable");
+
+            dayEl.classList.add(
+                "addable"
+            );
         }
 
 
@@ -1324,16 +1708,15 @@ function renderCalendar() {
             "events";
 
 
-        /* 일정이 정확히 하나일 때 */
+        /* 일정이 하나인 경우 */
 
         if (
             dayEvents.length === 1
         ) {
 
-            const event =
-                dayEvents[0];
-
-            if (event.color) {
+            if (
+                dayEvents[0].color
+            ) {
 
                 dayEl.classList.add(
                     "single-event"
@@ -1349,16 +1732,19 @@ function renderCalendar() {
         }
 
 
-        /* 일정 출력 */
+        /* 일정 */
 
         dayEvents.forEach(
             event => {
 
                 const eventEl =
-                    document.createElement("div");
+                    document.createElement(
+                        "div"
+                    );
 
                 eventEl.className =
                     "event";
+
 
                 if (event.color) {
 
@@ -1367,16 +1753,10 @@ function renderCalendar() {
                     );
                 }
 
+
                 eventEl.textContent =
                     event.title;
 
-                eventEl.title =
-                    isAdmin
-                        ? "클릭하여 수정"
-                        : event.title;
-
-
-                /* 관리자만 수정 가능 */
 
                 if (isAdmin) {
 
@@ -1386,10 +1766,13 @@ function renderCalendar() {
 
                             e.stopPropagation();
 
-                            openEditModal(event);
+                            openEditModal(
+                                event
+                            );
                         }
                     );
                 }
+
 
                 eventsEl.appendChild(
                     eventEl
@@ -1413,10 +1796,10 @@ function renderCalendar() {
                     return;
                 }
 
+
                 /*
-                    일정이 있는 날짜를 클릭하면
-                    첫 번째 일정을 수정.
-                    일정이 없는 날짜는 새 일정 추가.
+                   일정이 있는 날짜를 클릭하면
+                   첫 번째 일정 수정.
                 */
 
                 if (
@@ -1445,7 +1828,7 @@ function renderCalendar() {
 
 
 /* =========================================================
-   이전/다음 달
+   월 이동
 ========================================================= */
 
 function changeMonth(amount) {
@@ -1478,7 +1861,7 @@ function goToday() {
 
 
 /* =========================================================
-   일정 추가 모달
+   일정 추가
 ========================================================= */
 
 function openAddModal(dateString) {
@@ -1501,9 +1884,10 @@ function openAddModal(dateString) {
         "";
 
     /*
-       ★ 핵심
-       새 일정의 기본 색상은 "없음"
+       ★ 새 일정의 기본값
+       색상 없음
     */
+
     $("colorInput").value =
         "";
 
@@ -1517,16 +1901,16 @@ function openAddModal(dateString) {
         "show"
     );
 
-    setTimeout(() => {
-
-        $("titleInput").focus();
-
-    }, 100);
+    setTimeout(
+        () =>
+            $("titleInput").focus(),
+        100
+    );
 }
 
 
 /* =========================================================
-   일정 수정 모달
+   일정 수정
 ========================================================= */
 
 function openEditModal(event) {
@@ -1549,10 +1933,6 @@ function openEditModal(event) {
     $("titleInput").value =
         event.title;
 
-    /*
-       색상이 없는 기존 일정이면
-       빈 값으로 표시
-    */
     $("colorInput").value =
         event.color || "";
 
@@ -1566,13 +1946,16 @@ function openEditModal(event) {
         "show"
     );
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        $("titleInput").focus();
+            $("titleInput").focus();
 
-        $("titleInput").select();
+            $("titleInput").select();
 
-    }, 100);
+        },
+        100
+    );
 }
 
 
@@ -1638,12 +2021,12 @@ async function saveEvent() {
     }
 
 
-    const saveButton =
+    const button =
         $("saveButton");
 
-    saveButton.disabled = true;
+    button.disabled = true;
 
-    saveButton.textContent =
+    button.textContent =
         "저장 중...";
 
 
@@ -1672,7 +2055,7 @@ async function saveEvent() {
                     .single();
 
 
-        /* 신규 */
+        /* 추가 */
 
         } else {
 
@@ -1695,7 +2078,7 @@ async function saveEvent() {
         }
 
 
-        /* 화면 데이터 갱신 */
+        /* 화면 데이터 업데이트 */
 
         if (editingEventId) {
 
@@ -1734,26 +2117,22 @@ async function saveEvent() {
 
     } finally {
 
-        saveButton.disabled =
-            false;
+        button.disabled = false;
 
-        saveButton.textContent =
+        button.textContent =
             "저장";
     }
 }
 
 
 /* =========================================================
-   일정 삭제
+   삭제
 ========================================================= */
 
 async function deleteEvent() {
 
-    if (!isAdmin) {
-        return;
-    }
-
-    if (!editingEventId) {
+    if (!isAdmin ||
+        !editingEventId) {
         return;
     }
 
@@ -1771,19 +2150,16 @@ async function deleteEvent() {
     }
 
 
-    const confirmed =
-        confirm(
+    if (
+        !confirm(
             `"${event.title}" 일정을 삭제할까요?`
-        );
-
-
-    if (!confirmed) {
+        )
+    ) {
         return;
     }
 
 
     clearError();
-
 
     const button =
         $("deleteButton");
@@ -1835,8 +2211,7 @@ async function deleteEvent() {
 
     } finally {
 
-        button.disabled =
-            false;
+        button.disabled = false;
 
         button.textContent =
             "삭제";
@@ -1845,13 +2220,8 @@ async function deleteEvent() {
 
 
 /* =========================================================
-   Enter = 저장
+   Enter 저장
 ========================================================= */
-
-/*
-   일정 제목 입력창에서 Enter를 누르면
-   저장 버튼을 직접 클릭하지 않아도 저장된다.
-*/
 
 $("titleInput").addEventListener(
     "keydown",
@@ -1869,10 +2239,7 @@ $("titleInput").addEventListener(
 );
 
 
-/*
-   로그인 비밀번호 입력창에서도
-   Enter = 로그인
-*/
+/* 로그인창 Enter */
 
 $("passwordInput").addEventListener(
     "keydown",
@@ -1891,7 +2258,7 @@ $("passwordInput").addEventListener(
 
 
 /* =========================================================
-   ESC = 모달 닫기
+   ESC
 ========================================================= */
 
 document.addEventListener(
@@ -1912,7 +2279,7 @@ document.addEventListener(
 
 
 /* =========================================================
-   모달 배경 클릭 닫기
+   모달 바깥 클릭
 ========================================================= */
 
 function closeModalByBackground(
@@ -1921,20 +2288,22 @@ function closeModalByBackground(
 ) {
 
     if (
-        event.target.id === modalId
+        event.target.id !== modalId
+    ) {
+        return;
+    }
+
+
+    if (
+        modalId ===
+        "loginModal"
     ) {
 
-        if (
-            modalId ===
-            "loginModal"
-        ) {
+        closeLoginModal();
 
-            closeLoginModal();
+    } else {
 
-        } else {
-
-            closeEventModal();
-        }
+        closeEventModal();
     }
 }
 
@@ -1945,19 +2314,10 @@ function closeModalByBackground(
 
 async function init() {
 
-    /*
-       먼저 로그인 상태 확인
-    */
-
     await checkAuth();
-
-    /*
-       그 다음 DB에서 일정 불러오기
-    */
 
     await loadEvents();
 }
-
 
 init();
 
